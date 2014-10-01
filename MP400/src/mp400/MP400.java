@@ -44,9 +44,19 @@ public class MP400 {
       {0d, 1d, 0d},
       {0d, 0d, 0d}
     };
+    Double[][] box =
+    { {1d, 1d, 1d},
+      {1d, 1d, 1d},
+      {1d, 1d, 1d}
+    };
+    Double[][] edge =
+    { {1d, 0d, -1d},
+      {0d, 0d, 0d},
+      {-1d, 0d, 1d}
+    };
     
     
-       PixMask newMask = new PixMask(gauss);
+       PixMask newMask = new PixMask(box);
        PPMConvolve matrix = new PPMConvolve();
        PixMask normalMask = matrix.normalizeMask(newMask);
        matrix.convolve(normalMask, ppmData);

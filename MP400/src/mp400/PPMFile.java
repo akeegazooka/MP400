@@ -48,19 +48,21 @@ public class PPMFile {
         fileName = inFileName;
     }
     
-    public pixAbstract getAt(int xCoord, int yCoord)
+    public pixAbstract getAt(int inX, int inY)
     {
-        if(xCoord < 0)
+        int xCoord = inX;
+        int yCoord = inY;
+        if(inX < 0)
             xCoord = 0;
-        if(xCoord > dimensions.getX() -1)
+        if(inX > dimensions.getX() -1)
             xCoord = dimensions.getX()-1;
         
-        if(yCoord < 0)
+        if(inY < 0)
             yCoord = 0;
-        if(yCoord > dimensions.getY()-1)
+        if(inY > dimensions.getY()-1)
             yCoord = dimensions.getY()-1;
-        
-       // System.out.println(xCoord + ", " + yCoord);
+       //if( (inX!=xCoord) || (inY!= yCoord) ) 
+           //System.out.println("Corrected: " + inX + ", " + inY + " to " + xCoord + ", " + yCoord);
         
         return this.imageData.get(xCoord).get(yCoord);
     }
