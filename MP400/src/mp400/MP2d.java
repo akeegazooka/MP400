@@ -25,5 +25,28 @@ public class MP2d {
         y = inY;
     }
     
+    public void setX(int inX)
+    {
+        x = inX;
+    }
+    
+    public void setY(int inY)
+    {
+        y = inY;
+    }
+    public int getX()
+    {
+        return x;
+    }
+    
+    public int getY()
+    {
+        return y;
+    }
+    
+    public String toString()
+    {
+        return (""+ x + " " + y);
+    }
     
 }

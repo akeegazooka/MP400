@@ -35,17 +35,26 @@ public class PPMConvolve {
         {
             for(int iY = 0; iY < imageData.dimensions.getY();iY++)
             {
-                for (Double[] kernel : inMask.kernel) 
+                PixRGB accPix = new PixRGB();
+                for (int kX = 0; kX<inMask.kernel.length;kX++) 
                 {
-                    for (Double item : inMask.kernel[0])
+                    for (int kY = 0; kY<inMask.kernel[0].length;kY++)
                     {
+                       // System.out.println("Max dimensions are :" + imageOut.dimensions.getX() + " " + imageOut.dimensions.getY() + "\nFetching From: "  );
+                        PixRGB mulPix = (PixRGB) imageData.getAt(iX + kX - inMask.kernel.length/2, iY + kY - inMask.kernel[0].length);
+                        accPix = mulPixel(accPix, mulPix, inMask.kernel[kX][kY]);
+                        //imageOut.setAt(iX, iY, mulPixel( (PixRGB) inImage.getAt(iX, iY), inMask.kernel[kX][kY]));
+                        //System.out.println("Image coords: " + iX + ", " + iY + "\nKernel Coords: " + kX +", " + kY);
                         
                     }      
           
                 }
+                accPix = pixAbs(accPix);
+                imageOut.setAt(iX, iY, accPix);
+                //set output pixel to acc here
             }
         }
-        return imageData;
+        return imageOut;
     }
     
     public PixMask normalizeMask(PixMask inMask)
@@ -71,14 +80,32 @@ public class PPMConvolve {
         return normMask;
     }
     
-    private PixRGB rangeCheck(int inX, int inY)
+    private PixRGB mulPixel(PixRGB accPix, PixRGB inPixel, double mul)
     {
-        retX = 0;
-        if(inX < 0)
-        {
-            retX = 0;
-        }
-        else if(x > i)
-        PixRGB returnPixel;
+        PixRGB outPixel = new PixRGB(inPixel);
+        outPixel.setR(accPix.getR() + (int) Math.floor(inPixel.getR() * mul));
+        outPixel.setG(accPix.getG() + (int) Math.floor(inPixel.getG() * mul));
+        outPixel.setB(accPix.getB() + (int) Math.floor(inPixel.getB() * mul));
+        return outPixel;
     }
+    
+    private PixRGB pixAbs(PixRGB inPix)
+    {
+        inPix.setR(Math.abs(inPix.getR()));
+        inPix.setG(Math.abs(inPix.getG()));
+        inPix.setB(Math.abs(inPix.getB()));
+        
+        return inPix;
+    }
+//    
+//    private PixRGB rangeCheck(int inX, int inY)
+//    {
+//        retX = 0;
+//        if(inX < 0)
+//        {
+//            retX = 0;
+//        }
+//        else if(x > i)
+//        PixRGB returnPixel;
+//    }
 }
