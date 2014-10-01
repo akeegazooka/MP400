@@ -50,15 +50,14 @@ public class PPMFile {
     
     public pixAbstract getAt(int xCoord, int yCoord)
     {
-        pixAbstract outPix;
         if(xCoord < 0)
             xCoord = 0;
-        else if(xCoord > dimensions.getX() -1)
+        if(xCoord > dimensions.getX() -1)
             xCoord = dimensions.getX()-1;
         
         if(yCoord < 0)
             yCoord = 0;
-        else if(yCoord > dimensions.getY()-1)
+        if(yCoord > dimensions.getY()-1)
             yCoord = dimensions.getY()-1;
         
        // System.out.println(xCoord + ", " + yCoord);
@@ -68,6 +67,7 @@ public class PPMFile {
     
     public void setAt(int xCoord, int yCoord, PixRGB inRGB)
     {
+        //System.out.println("Setting pixel @: " + xCoord+", "+yCoord );
         this.imageData.get(xCoord).set(yCoord, new PixRGB(inRGB) );
     }
     

@@ -24,12 +24,12 @@ public class PPMConvolve {
     {
         imageData = inImage;
         PPMFile imageOut = new PPMFile(imageData);
-        int xOffset = 0;
-        int yOffset = 0;
-        if(inMask.dimensions.getX() % 2 != 0)
-            xOffset = (int)Math.floor( (float)inMask.dimensions.getX()/2.0 );
-        if(inMask.dimensions.getY() % 2 != 0)
-            yOffset = (int)Math.floor( (float)inMask.dimensions.getY()/2.0 );
+//        int xOffset = 0;
+//        int yOffset = 0;
+//        if(inMask.dimensions.getX() % 2 != 0)
+//            xOffset = (int)Math.floor( (float)inMask.dimensions.getX()/2.0 );
+//        if(inMask.dimensions.getY() % 2 != 0)
+//            yOffset = (int)Math.floor( (float)inMask.dimensions.getY()/2.0 );
         
         for(int iX = 0; iX < imageData.dimensions.getX();iX++)
         {
@@ -42,6 +42,7 @@ public class PPMConvolve {
                     {
                        // System.out.println("Max dimensions are :" + imageOut.dimensions.getX() + " " + imageOut.dimensions.getY() + "\nFetching From: "  );
                         PixRGB mulPix = (PixRGB) imageData.getAt(iX + kX - inMask.kernel.length/2, iY + kY - inMask.kernel[0].length);
+                        
                         accPix = mulPixel(accPix, mulPix, inMask.kernel[kX][kY]);
                         //imageOut.setAt(iX, iY, mulPixel( (PixRGB) inImage.getAt(iX, iY), inMask.kernel[kX][kY]));
                         //System.out.println("Image coords: " + iX + ", " + iY + "\nKernel Coords: " + kX +", " + kY);
@@ -51,6 +52,7 @@ public class PPMConvolve {
                 }
                 accPix = pixAbs(accPix);
                 imageOut.setAt(iX, iY, accPix);
+                //System.out.println("Writing pixel: "+ iX + ", " + iY);
                 //set output pixel to acc here
             }
         }
@@ -86,6 +88,7 @@ public class PPMConvolve {
         outPixel.setR(accPix.getR() + (int) Math.floor(inPixel.getR() * mul));
         outPixel.setG(accPix.getG() + (int) Math.floor(inPixel.getG() * mul));
         outPixel.setB(accPix.getB() + (int) Math.floor(inPixel.getB() * mul));
+        //System.out.println(outPixel.getR() +", " + outPixel.getG() +", "+ outPixel.getB());
         return outPixel;
     }
     

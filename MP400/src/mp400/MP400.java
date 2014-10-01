@@ -34,10 +34,12 @@ public class MP400 {
            ppmData.writePPM("out.ppm");
        
 
-    Double[][] gauss = {{1d, 2d, 1d},
-    {2d, 4d, 2d},
-    {1d, 2d, 1d}
+    Double[][] gauss = 
+    { {1d, 2d, 1d},
+      {2d, 4d, 2d},
+      {1d, 2d, 1d}
     };
+    
        PixMask newMask = new PixMask(gauss);
        PPMConvolve matrix = new PPMConvolve();
        PixMask normalMask = matrix.normalizeMask(newMask);
