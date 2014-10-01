@@ -5,19 +5,24 @@
  */
 
 package mp400;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
+import sun.awt.X11.XTimeCoord;
 
 /**
  *
  * @author akeegazooka
  */
 public class PPMFile {
-    ArrayList<Integer[]> imageData;
+    ArrayList<ArrayList<pixAbstract>> imageData;
     String format;
     MP2d dimensions;
     Integer maxValue;
@@ -26,7 +31,16 @@ public class PPMFile {
     public PPMFile(String inFileName) throws IOException
     {
         setFileName(inFileName);
-        loadFile();
+        loadPPM();
+    }
+    
+    public PPMFile(PPMFile inFile)
+    {
+        imageData = inFile.imageData;
+        format = inFile.format;
+        dimensions = inFile.dimensions;
+        maxValue = inFile.maxValue;
+        fileName = inFile.fileName;
     }
     
     private void setFileName(String inFileName)
@@ -34,23 +48,45 @@ public class PPMFile {
         fileName = inFileName;
     }
     
-    private void loadFile() throws IOException
+    public pixAbstract getAt(int xCoord, int yCoord)
     {
-        BufferedReader inputStream = null;
+        pixAbstract outPix;
+        if(xCoord < 0)
+            xCoord = 0;
+        else if(xCoord > dimensions.getX() -1)
+            xCoord = dimensions.getX()-1;
+        
+        if(yCoord < 0)
+            yCoord = 0;
+        else if(yCoord > dimensions.getY()-1)
+            yCoord = dimensions.getY()-1;
+        
+       // System.out.println(xCoord + ", " + yCoord);
+        
+        return this.imageData.get(xCoord).get(yCoord);
+    }
+    
+    public void setAt(int xCoord, int yCoord, PixRGB inRGB)
+    {
+        this.imageData.get(xCoord).set(yCoord, new PixRGB(inRGB) );
+    }
+    
+    private void loadPPM()
+    {
+        Scanner sc = null;
         if(! (fileName.equals("") ) )
         {
-        try
-        {
-            inputStream = new BufferedReader(new FileReader(fileName)) ;
-            
-            String s;
-            boolean metaFull = false;
-            String dataString = "";
-            String[] dataElements;
-            String[] lineResult;
-            do {
-            while( (s = inputStream.readLine()) !=null)
+            try
             {
+                sc  = new Scanner(new FileInputStream(fileName));     
+                String s;
+                boolean metaFull = false;
+                String dataString = "";
+                String[] dataElements = null;
+                String[] lineResult;
+                while(sc.hasNextLine() && (!metaFull) )
+                {
+                    s = sc.nextLine();
                     lineResult = s.split("#");
                     if(! lineResult[0].equals("") )
                     {
@@ -59,34 +95,92 @@ public class PPMFile {
                         if(dataElements.length == 5)
                         {
                             metaFull = true;
-                            for(String sElement : dataElements)
-                            {
-                                System.out.println(sElement);
-                            }
                         }
-                        
                     }
-                
                 }
-                
-            }while (!metaFull);
-            
-        } 
-        catch (IOException x)
-        {
-            System.out.println(x.getMessage());
-        }
-        finally
-        {
-            if(inputStream != null)
+
+                if(dataElements != null)
+                {
+                    format = dataElements[1];
+                    dimensions = new MP2d(Integer.parseInt(dataElements[2]), Integer.parseInt(dataElements[3]) );
+                    imageData = new ArrayList<>();
+                    maxValue = Integer.parseInt(dataElements[4]);
+                    PixRGB tempRGBData;
+
+                    try 
+                    {
+                       for(int x = 0;x < dimensions.getX();x++)
+                       {
+                           imageData.add(new ArrayList<pixAbstract>());
+                           for(int y = 0;y<dimensions.getY();y++)
+                           {
+                               tempRGBData = new PixRGB();
+                               tempRGBData.setR(sc.nextInt());
+                               tempRGBData.setG(sc.nextInt());
+                               tempRGBData.setB(sc.nextInt());
+                               imageData.get(x).add(tempRGBData);
+                           }
+                       }
+                    }
+                    catch (ArrayIndexOutOfBoundsException e)
+                    {
+                        System.out.println(e.getMessage());
+                    }  
+                }
+                else
+                {
+                    throw new IOException();
+                }
+            } 
+            catch (IOException x)
             {
-                inputStream.close();
+                System.out.println(x.getMessage());
             }
-        }
+            finally
+            {
+                if(sc!=null)
+                    sc.close();    
+            }
         }
     }
     
-    
-    
-    
+    public void writePPM(String outFile)
+    {
+        PrintWriter pw = null;
+        try
+        {
+            pw = new PrintWriter(new File(outFile));    
+        }
+        catch (FileNotFoundException e)
+        {
+            System.out.println(e.getMessage());
+        }
+        try
+        {
+            if(pw != null)
+            {
+                pw.print("P3\n"+this.dimensions.getX() + " " + this.dimensions.getY() + "\n"+ maxValue+"\n");
+                for(int xx= 0; xx < this.dimensions.getX();xx++)
+                {
+                    for(int yy = 0; yy < this.dimensions.getY();yy++)
+                    {
+                         if( (float)yy%5.0 == 0 )
+                            pw.print("\n");
+                        pw.print(this.imageData.get(xx).get(yy).toString());
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        finally
+        {
+            if(pw!=null)
+            {
+                pw.close();
+            }
+        }
+    } 
 }
