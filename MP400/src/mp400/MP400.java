@@ -39,12 +39,19 @@ public class MP400 {
       {2d, 4d, 2d},
       {1d, 2d, 1d}
     };
+    Double[][] identity = 
+    { {0d, 0d, 0d},
+      {0d, 1d, 0d},
+      {0d, 0d, 0d}
+    };
+    
     
        PixMask newMask = new PixMask(gauss);
        PPMConvolve matrix = new PPMConvolve();
        PixMask normalMask = matrix.normalizeMask(newMask);
        matrix.convolve(normalMask, ppmData);
-       ppmData.writePPM("out1.ppm");
+       if(ppmData!=null)
+            ppmData.writePPM("out1.ppm");
 
        
     }

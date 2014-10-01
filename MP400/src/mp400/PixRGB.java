@@ -11,11 +11,11 @@ package mp400;
  * @author akeegazooka
  */
 public class PixRGB extends pixAbstract {
-    private int r;
-    private int g;
-    private int b;
+    private double r;
+    private double g;
+    private double b;
     
-    public PixRGB(int inR, int inG, int inB)
+    public PixRGB(double inR, double inG, double inB)
     {
         r = inR;
         g = inG;
@@ -24,9 +24,9 @@ public class PixRGB extends pixAbstract {
     
     public PixRGB()
     {
-        r = 0;
-        g = 0;
-        b = 0;
+        r = 0d;
+        g = 0d;
+        b = 0d;
     }
     
     public PixRGB(PixRGB inRGB)
@@ -36,32 +36,32 @@ public class PixRGB extends pixAbstract {
         b = inRGB.b;
     }
     
-    public int getR()
+    public double getR()
     {
         return r;
     }
     
-    public int getG()
+    public double getG()
     {
         return g;
     }
     
-    public int getB()
+    public double getB()
     {
         return b;
     }
     
-    public void setR(int inR)
+    public void setR(double inR)
     {
         r = inR;
     }
     
-    public void setG(int inG)
+    public void setG(double inG)
     {
         g = inG;
     }
     
-    public void setB(int inB)
+    public void setB(double inB)
     {
         b = inB;
     }
@@ -71,7 +71,7 @@ public class PixRGB extends pixAbstract {
     @Override
     public String toString()
     {
-        return (""+r+" "+ g+" "+b+" ");
+        return ((int) Math.floor(r)+" "+ (int) Math.floor(g)+" "+ (int) Math.floor(b)+" ");
           
     }
     

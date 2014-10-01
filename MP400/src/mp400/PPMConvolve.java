@@ -15,33 +15,23 @@ public class PPMConvolve {
     PixMask normalMask;
     PPMFile imageData;
     
-    final private Double[][] gauss = { {1d,2d,1d},
-                                 {2d,4d,2d},
-                                 {1d,2d,1d}
-                               };
-    
     public PPMFile convolve(PixMask inMask, PPMFile inImage)
     {
         imageData = inImage;
-        PPMFile imageOut = new PPMFile(imageData);
-//        int xOffset = 0;
-//        int yOffset = 0;
-//        if(inMask.dimensions.getX() % 2 != 0)
-//            xOffset = (int)Math.floor( (float)inMask.dimensions.getX()/2.0 );
-//        if(inMask.dimensions.getY() % 2 != 0)
-//            yOffset = (int)Math.floor( (float)inMask.dimensions.getY()/2.0 );
-        
+        PPMFile imageOut = new PPMFile(imageData);                                                                                   
         for(int iX = 0; iX < imageData.dimensions.getX();iX++)
         {
             for(int iY = 0; iY < imageData.dimensions.getY();iY++)
             {
+                //System.out.println("Visiting: "+iX + ", " + iY);
                 PixRGB accPix = new PixRGB();
                 for (int kX = 0; kX<inMask.kernel.length;kX++) 
                 {
                     for (int kY = 0; kY<inMask.kernel[0].length;kY++)
                     {
+                       // System.out.println("Visiting: "+iX + kX - inMask.kernel.length/2 + ", " + kY);
                        // System.out.println("Max dimensions are :" + imageOut.dimensions.getX() + " " + imageOut.dimensions.getY() + "\nFetching From: "  );
-                        PixRGB mulPix = (PixRGB) imageData.getAt(iX + kX - inMask.kernel.length/2, iY + kY - inMask.kernel[0].length);
+                        PixRGB mulPix = (PixRGB) imageData.getAt(iX + kX - inMask.kernel.length/2, iY + kY - inMask.kernel[0].length/2);
                         
                         accPix = mulPixel(accPix, mulPix, inMask.kernel[kX][kY]);
                         //imageOut.setAt(iX, iY, mulPixel( (PixRGB) inImage.getAt(iX, iY), inMask.kernel[kX][kY]));
