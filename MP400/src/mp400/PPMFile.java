@@ -15,14 +15,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
-import sun.awt.X11.XTimeCoord;
 
 /**
  *
  * @author akeegazooka
  */
 public class PPMFile {
-    ArrayList<ArrayList<pixAbstract>> imageData;
+    ArrayList<ArrayList<PixRGB>> imageData;
     String format;
     MP2d dimensions;
     Integer maxValue;
@@ -48,7 +47,7 @@ public class PPMFile {
         fileName = inFileName;
     }
     
-    public pixAbstract getAt(int inX, int inY)
+    public PixRGB getAt(int inX, int inY)
     {
         int xCoord = inX;
         int yCoord = inY;
@@ -61,16 +60,16 @@ public class PPMFile {
             yCoord = 0;
         if(inY > dimensions.getY()-1)
             yCoord = dimensions.getY()-1;
-       //if( (inX!=xCoord) || (inY!= yCoord) ) 
-           //System.out.println("Corrected: " + inX + ", " + inY + " to " + xCoord + ", " + yCoord);
         
-        return this.imageData.get(xCoord).get(yCoord);
+        return new PixRGB(this.imageData.get(xCoord).get(yCoord));
     }
     
     public void setAt(int xCoord, int yCoord, PixRGB inRGB)
     {
-        //System.out.println("Setting pixel @: " + xCoord+", "+yCoord );
+       // System.out.println("Setting pixel @: " + xCoord+", "+yCoord );
         this.imageData.get(xCoord).set(yCoord, new PixRGB(inRGB) );
+        //this.imageData[xCoord][yCoord] = inRGB;
+        
     }
     
     private void loadPPM()
@@ -113,7 +112,7 @@ public class PPMFile {
                     {
                        for(int x = 0;x < dimensions.getX();x++)
                        {
-                           imageData.add(new ArrayList<pixAbstract>());
+                           imageData.add(new ArrayList<PixRGB>());
                            for(int y = 0;y<dimensions.getY();y++)
                            {
                                tempRGBData = new PixRGB();
@@ -168,7 +167,8 @@ public class PPMFile {
                     {
                          if( (float)yy%5.0 == 0 )
                             pw.print("\n");
-                        pw.print(this.imageData.get(xx).get(yy).toString());
+                        //pw.print(this.imageData.get(xx).get(yy).toString());
+                         pw.print(this.getAt(xx, yy));
                     }
                 }
             }

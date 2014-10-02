@@ -50,16 +50,20 @@ public class MP400 {
       {1d, 1d, 1d}
     };
     Double[][] edge =
-    { {1d, 0d, -1d},
-      {0d, 0d, 0d},
-      {-1d, 0d, 1d}
+    { {-1d, -1d, -1d},
+      {-1d, 8d, -1d},
+      {-1d, -1d, -1d}
     };
+    Double[][] test =
+    { {0d, 0d, 0d},
+      {0d, 2d, 0d},
+      {0d, 0d, 0d}
+    };    
     
-    
-       PixMask newMask = new PixMask(box);
+       PixMask newMask = new PixMask(gauss);
        PPMConvolve matrix = new PPMConvolve();
        PixMask normalMask = matrix.normalizeMask(newMask);
-       matrix.convolve(normalMask, ppmData);
+       ppmData = matrix.convolve(normalMask, ppmData);
        if(ppmData!=null)
             ppmData.writePPM("out1.ppm");
 

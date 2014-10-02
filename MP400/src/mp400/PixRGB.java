@@ -11,9 +11,9 @@ package mp400;
  * @author akeegazooka
  */
 public class PixRGB extends pixAbstract {
-    private double r;
-    private double g;
-    private double b;
+    public double r;
+    public double g;
+    public double b;
     
     public PixRGB(double inR, double inG, double inB)
     {

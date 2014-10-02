@@ -23,44 +23,37 @@ public class PPMConvolve {
         int kWidth = inMask.kernel.length;
         int kHeight = inMask.kernel[0].length;
         
-        
-        for(int iY = 0; iY < height;iY++)
+        for(int iY = 0;iY<imageOut.dimensions.getY();iY++)
         {
-            for(int iX = 0; iX < width; iX++)
+            for(int iX = 0;iX<imageOut.dimensions.getX();iX++)
             {
-                //System.out.println("Visiting: "+iX + ", " + iY);
-                PixRGB accPix = new PixRGB();
-                for (int kY = 0; kY < kHeight; kY++) 
+                PixRGB newPix = new PixRGB();
+                for(int kY = 0;kY<kHeight;kY++)
                 {
-                    for (int kX = 0; kX < kWidth; kX++)
+                    for(int kX = 0;kX<kWidth;kX++)
                     {
-                       // System.out.println("Visiting: "+iX + kX - inMask.kernel.length/2 + ", " + kY);
-                       // System.out.println("Max dimensions are :" + imageOut.dimensions.getX() + " " + imageOut.dimensions.getY() + "\nFetching From: "  );
-                        int fetchX = iX + kX - kWidth  /2;
-                        int fetchY = iY + kY - kHeight /2;
+                        int fetchX = clamp( (iX+kX - kWidth/2), 0, inImage.dimensions.getX() );
+                        int fetchY = clamp( (iY+kY - kHeight/2), 0, inImage.dimensions.getY() );
+                        PixRGB  mulPixel = inImage.getAt(fetchX,fetchY);
                         
-                        PixRGB mulPix = (PixRGB) inImage.getAt(fetchX, fetchY);
-                       // System.out.println(String.format("setting to x: %d y: %d\nkX: %d kY %d\nMultiplying the pixel %f,%f,%f by: %f\nusing the pixel located at %d, %d", iX, iY, kX, kY,mulPix.getR(), mulPix.getG(), mulPix.getB(), inMask.kernel[kX][kY], (iX + kX - inMask.kernel.length/2), (iY + kY - inMask.kernel[0].length/2) ));
-                        //accPix = mulPixel(accPix, mulPix, inMask.kernel[kX][kY]);
-                        accPix.setR( (accPix.getR() + (mulPix.getR() * inMask.kernel[kX][kY]) ) );
-                        accPix.setG( (accPix.getG() + (mulPix.getG() * inMask.kernel[kX][kY]) ) );
-                        accPix.setB( (accPix.getB() + (mulPix.getB() * inMask.kernel[kX][kY]) ) );
-                        
-                        //imageOut.setAt(iX, iY, mulPixel( (PixRGB) inImage.getAt(iX, iY), inMask.kernel[kX][kY]));
-                        //System.out.println("Image coords: " + iX + ", " + iY + "\nKernel Coords: " + kX +", " + kY);
-                        
-                    }      
-          
+                        newPix.r += mulPixel.r * inMask.kernel[kX][kY];
+                        newPix.g += mulPixel.g * inMask.kernel[kX][kY];
+                        newPix.b += mulPixel.b * inMask.kernel[kX][kY];
+                    }
                 }
-                accPix = pixAbs(accPix);
-                imageOut.setAt(iX, iY, accPix);
-               // System.out.println("Writing pixel: " + accPix.getR()+ " " +accPix.getG()+" "+ accPix.getB()+" to "+ iX + ", " + iY);
-                //set output pixel to acc here
+                newPix = pixAbs(newPix);
+                imageOut.setAt(iX, iY, newPix);
             }
         }
+        
         return imageOut;
     }
     
+    private static int clamp(int inVal, int minVal, int maxVal)
+    {
+         return Math.max(minVal, Math.min(maxVal, inVal));
+
+    }
     public PixMask normalizeMask(PixMask inMask)
     {
         PixMask normMask = new PixMask(inMask.kernel);
@@ -93,15 +86,4 @@ public class PPMConvolve {
         
         return inPix;
     }
-//    
-//    private PixRGB rangeCheck(int inX, int inY)
-//    {
-//        retX = 0;
-//        if(inX < 0)
-//        {
-//            retX = 0;
-//        }
-//        else if(x > i)
-//        PixRGB returnPixel;
-//    }
 }
