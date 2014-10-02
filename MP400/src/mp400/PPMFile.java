@@ -42,6 +42,15 @@ public class PPMFile {
         fileName = inFile.getFileName();
     }
     
+    public PPMFile(int inWidth, int inHeight, int max, String inFormat)
+    {
+        imageData = new PixRGB[inWidth][inHeight];
+        dimensions = new MP2d(inWidth, inHeight);
+        format = inFormat;
+        maxValue = max;
+        
+    }
+    
     public PixRGB[][] getImageData()
     {
         PixRGB[][] outData = new PixRGB[dimensions.getX()][dimensions.getY()];
@@ -95,14 +104,46 @@ public class PPMFile {
         return outPixel;
     }
     
-    public void setAt(int xCoord, int yCoord, PixRGB inRGB)
+    public void setAt(int xCoord, int yCoord, PixRGB inRGB, boolean wtf)
     {
        // System.out.println("Setting pixel @: " + xCoord+", "+yCoord );
+
         PixRGB newPixel = new PixRGB(inRGB);
+                
         imageData[xCoord][yCoord] = newPixel;
+//        if(wtf) {
+//            System.out.println("MEOW " + xCoord+", "+yCoord+" = [" +inRGB.toString()+"]-> ["+getAt(xCoord, yCoord)+"]");
+//        }
         //System.out.println(xCoord + " " + yCoord);
         //this.imageData[xCoord][yCoord] = inRGB;
         
+    }
+    
+    public void threshold(double thresh)
+    {
+        for(int i = 0; i < dimensions.getY();i++)
+        {
+            for(int j = 0; j < dimensions.getX();j++)
+            {
+                PixRGB workingPixel = getAt(j, i);
+                double pixSum = workingPixel.getR() + workingPixel.getG() + workingPixel.getB();
+                pixSum /=3;
+                
+                if(pixSum >= thresh)
+                {
+                    workingPixel.setR(maxValue);
+                    workingPixel.setG(maxValue);
+                    workingPixel.setB(maxValue);
+                }
+                else
+                {
+                    workingPixel.setR(0);
+                    workingPixel.setG(0);
+                    workingPixel.setB(0);
+                }
+                setAt(j, i, workingPixel, false);
+            }
+        }
     }
     
     private void loadPPM()
@@ -135,6 +176,10 @@ public class PPMFile {
 
                 if(dataElements != null)
                 {
+                    for(int jj = 0;jj<5;jj++)
+                    {
+                        System.out.println(dataElements[jj]);
+                    }
                     format = dataElements[1];
                     dimensions = new MP2d(Integer.parseInt(dataElements[2]), Integer.parseInt(dataElements[3]) );
                     imageData = new PixRGB[dimensions.getX()][dimensions.getY()];
@@ -143,10 +188,12 @@ public class PPMFile {
 
                     try 
                     {
-                       for(int x = 0;x < dimensions.getX();x++)
+                       for(int y = 0;y<dimensions.getY();y++)
+                       //for(int x = 0;x < dimensions.getX();x++)
                        {
                            //imageData.add(new ArrayList<PixRGB>());
-                           for(int y = 0;y<dimensions.getY();y++)
+                           for(int x = 0;x < dimensions.getX();x++)
+                           //for(int y = 0;y<dimensions.getY();y++)
                            {
                                tempRGBData = new PixRGB();
                                tempRGBData.setR(sc.nextInt());
@@ -195,9 +242,11 @@ public class PPMFile {
             if(pw != null)
             {
                 pw.print("P3\n"+this.dimensions.getX() + " " + this.dimensions.getY() + "\n"+ maxValue+"\n");
-                for(int xx= 0; xx < this.dimensions.getX();xx++)
+                //for(int xx = 0; xx < this.dimensions.getX();xx++)
+                for(int yy= 0; yy < this.dimensions.getY();yy++)
                 {
-                    for(int yy = 0; yy < this.dimensions.getY();yy++)
+                    //for(int yy= 0; yy < this.dimensions.getY();yy++)
+                    for(int xx = 0; xx < this.dimensions.getX();xx++)
                     {
 //                         if( (float)yy%5.0 == 0 )
 //                            pw.print("\n");

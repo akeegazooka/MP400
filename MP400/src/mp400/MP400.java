@@ -57,17 +57,48 @@ public class MP400 {
     { {0d, 0d, 0d},
       {0d, 2d, 0d},
       {0d, 0d, 0d}
-    };    
+    };
+    Double[][] ident1 = 
+    { {0d, 0d, 0d},
+      {0d, 1d, 1d},
+      {0d, 0d, 0d}
+    };
+    Double[][] ident2 = 
+    { {0d, 1d, 0d},
+      {0d, 1d, 0d},
+      {0d, 0d, 0d}
+    };
+    Double[][] mexicanHat =
+    { { 0d, 0d,-1d,-1d,-1d, 0d, 0d},
+      { 0d,-1d,-3d,-3d,-3d,-1d, 0d},
+      {-1d,-3d, 0d, 7d, 0d,-3d,-1d},
+      {-1d,-3d, 7d,24d, 7d,-3d,-1d},
+      {-1d,-3d, 0d, 7d, 0d,-3d,-1d},
+      { 0d,-1d,-3d,-3d,-3d,-1d, 0d},
+      { 0d, 0d,-1d,-1d,-1d, 0d, 0d}
+    };
     
-       PixMask newMask = new PixMask(gauss);
        PPMConvolve matrix = new PPMConvolve();
-       PixMask normalMask = matrix.normalizeMask(newMask);
+       Double[][] genGauss = matrix.generateGaussKernel(2.5d);
+       PixMask newMask = new PixMask(mexicanHat);
+       PixMask mexican = matrix.normalizeMask(newMask);
        
-       PPMFile newPpmData = matrix.convolve(normalMask, ppmData);
+       PixMask newMask1 = new PixMask(genGauss);
+       PixMask gaussian = matrix.normalizeMask(newMask1);
+     
+       
+       PPMFile newPpmData;
+       newPpmData = matrix.convolve(gaussian, ppmData);
+       
+       newPpmData= matrix.convolve(mexican, ppmData);
+       newPpmData.threshold(8d);
+
        if(ppmData!=null)
        {
-            ppmData.writePPM("original.ppm");
+            //newFile.writePPM("original.ppm");
             newPpmData.writePPM("out.ppm");
+            ppmData.writePPM("original.ppm");
+            
        }
 
        
