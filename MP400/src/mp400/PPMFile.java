@@ -21,7 +21,7 @@ import java.util.Scanner;
  * @author akeegazooka
  */
 public class PPMFile {
-    ArrayList<ArrayList<PixRGB>> imageData;
+    PixRGB[][] imageData;
     String format;
     MP2d dimensions;
     Integer maxValue;
@@ -35,11 +35,49 @@ public class PPMFile {
     
     public PPMFile(PPMFile inFile)
     {
-        imageData = inFile.imageData;
-        format = inFile.format;
-        dimensions = inFile.dimensions;
-        maxValue = inFile.maxValue;
-        fileName = inFile.fileName;
+        imageData = inFile.getImageData();
+        format = inFile.getFormat();
+        dimensions = inFile.getDimensions();
+        maxValue = inFile.getMaxValue();
+        fileName = inFile.getFileName();
+    }
+    
+    public PixRGB[][] getImageData()
+    {
+        PixRGB[][] outData = new PixRGB[dimensions.getX()][dimensions.getY()];
+        for(int i = 0;i<dimensions.getY();i++)
+        {
+            for(int j = 0;j<dimensions.getX();j++)
+            {
+                outData[j][i] = this.getAt(j, i);
+                //System.out.println("Copied pixel: " + outData[j][i]);
+            }
+        }
+        return outData;
+    }
+    
+    public String getFormat()
+    {
+        String outFormat = this.format;
+        
+        return outFormat;
+    }
+    
+    public MP2d getDimensions()
+    {
+        MP2d outDimensions = new MP2d(dimensions);
+        
+        return outDimensions;
+    }
+    
+    public int getMaxValue()
+    {
+        return maxValue;
+    }
+    
+    public String getFileName()
+    {
+        return fileName;
     }
     
     private void setFileName(String inFileName)
@@ -49,25 +87,20 @@ public class PPMFile {
     
     public PixRGB getAt(int inX, int inY)
     {
-        int xCoord = inX;
-        int yCoord = inY;
-        if(inX < 0)
-            xCoord = 0;
-        if(inX > dimensions.getX() -1)
-            xCoord = dimensions.getX()-1;
-        
-        if(inY < 0)
-            yCoord = 0;
-        if(inY > dimensions.getY()-1)
-            yCoord = dimensions.getY()-1;
-        
-        return new PixRGB(this.imageData.get(xCoord).get(yCoord));
+        PixRGB outPixel = new PixRGB();
+        outPixel.r = imageData[inX][inY].r;
+        outPixel.g = imageData[inX][inY].g;
+        outPixel.b = imageData[inX][inY].b;
+ 
+        return outPixel;
     }
     
     public void setAt(int xCoord, int yCoord, PixRGB inRGB)
     {
        // System.out.println("Setting pixel @: " + xCoord+", "+yCoord );
-        this.imageData.get(xCoord).set(yCoord, new PixRGB(inRGB) );
+        PixRGB newPixel = new PixRGB(inRGB);
+        imageData[xCoord][yCoord] = newPixel;
+        //System.out.println(xCoord + " " + yCoord);
         //this.imageData[xCoord][yCoord] = inRGB;
         
     }
@@ -104,7 +137,7 @@ public class PPMFile {
                 {
                     format = dataElements[1];
                     dimensions = new MP2d(Integer.parseInt(dataElements[2]), Integer.parseInt(dataElements[3]) );
-                    imageData = new ArrayList<>();
+                    imageData = new PixRGB[dimensions.getX()][dimensions.getY()];
                     maxValue = Integer.parseInt(dataElements[4]);
                     PixRGB tempRGBData;
 
@@ -112,14 +145,15 @@ public class PPMFile {
                     {
                        for(int x = 0;x < dimensions.getX();x++)
                        {
-                           imageData.add(new ArrayList<PixRGB>());
+                           //imageData.add(new ArrayList<PixRGB>());
                            for(int y = 0;y<dimensions.getY();y++)
                            {
                                tempRGBData = new PixRGB();
                                tempRGBData.setR(sc.nextInt());
                                tempRGBData.setG(sc.nextInt());
                                tempRGBData.setB(sc.nextInt());
-                               imageData.get(x).add(tempRGBData);
+                               //imageData.get(x).add(tempRGBData);
+                               imageData[x][y] = tempRGBData;
                            }
                        }
                     }
@@ -165,10 +199,11 @@ public class PPMFile {
                 {
                     for(int yy = 0; yy < this.dimensions.getY();yy++)
                     {
-                         if( (float)yy%5.0 == 0 )
-                            pw.print("\n");
+//                         if( (float)yy%5.0 == 0 )
+//                            pw.print("\n");
                         //pw.print(this.imageData.get(xx).get(yy).toString());
                          pw.print(this.getAt(xx, yy));
+                         pw.print("\n");
                     }
                 }
             }

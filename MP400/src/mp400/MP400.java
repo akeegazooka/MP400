@@ -30,8 +30,7 @@ public class MP400 {
        {
            System.out.println(e.getMessage());
        }
-       if(ppmData!=null)
-           ppmData.writePPM("out.ppm");
+           
        
 
     Double[][] gauss = 
@@ -63,9 +62,13 @@ public class MP400 {
        PixMask newMask = new PixMask(gauss);
        PPMConvolve matrix = new PPMConvolve();
        PixMask normalMask = matrix.normalizeMask(newMask);
-       ppmData = matrix.convolve(normalMask, ppmData);
+       
+       PPMFile newPpmData = matrix.convolve(normalMask, ppmData);
        if(ppmData!=null)
-            ppmData.writePPM("out1.ppm");
+       {
+            ppmData.writePPM("original.ppm");
+            newPpmData.writePPM("out.ppm");
+       }
 
        
     }

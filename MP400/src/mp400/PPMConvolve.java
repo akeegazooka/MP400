@@ -17,23 +17,24 @@ public class PPMConvolve {
     public PPMFile convolve(PixMask inMask, PPMFile inImage)
     {
         PPMFile imageOut = new PPMFile(inImage);
+        
         int width = imageOut.dimensions.getX();
         int height = imageOut.dimensions.getY();
         
         int kWidth = inMask.kernel.length;
         int kHeight = inMask.kernel[0].length;
         
-        for(int iY = 0;iY<imageOut.dimensions.getY();iY++)
+        for(int iY = 0;iY<height;iY++)
         {
-            for(int iX = 0;iX<imageOut.dimensions.getX();iX++)
+            for(int iX = 0;iX<width;iX++)
             {
                 PixRGB newPix = new PixRGB();
                 for(int kY = 0;kY<kHeight;kY++)
                 {
                     for(int kX = 0;kX<kWidth;kX++)
                     {
-                        int fetchX = clamp( (iX+kX - kWidth/2), 0, inImage.dimensions.getX() );
-                        int fetchY = clamp( (iY+kY - kHeight/2), 0, inImage.dimensions.getY() );
+                        int fetchX = clamp( (iX+kX - kWidth/2), 0, width-1 );
+                        int fetchY = clamp( (iY+kY - kHeight/2), 0, height-1);
                         PixRGB  mulPixel = inImage.getAt(fetchX,fetchY);
                         
                         newPix.r += mulPixel.r * inMask.kernel[kX][kY];

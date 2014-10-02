@@ -25,6 +25,13 @@ public class MP2d {
         y = inY;
     }
     
+    public MP2d(MP2d inDim)
+    {
+        
+        x = inDim.getX();
+        y = inDim.getY();
+    }
+    
     public void setX(int inX)
     {
         x = inX;
@@ -44,6 +51,7 @@ public class MP2d {
         return y;
     }
     
+    @Override
     public String toString()
     {
         return (""+ x + " " + y);
