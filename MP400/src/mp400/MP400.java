@@ -24,7 +24,7 @@ public class MP400 {
        PPMFile ppmData = null;
        try
        {
-            ppmData = new PPMFile("/home/akeegazooka/Desktop/8.ppm");
+            ppmData = new PPMFile("/home/akeegazooka/Desktop/9.ppm");
        }
        catch(IOException e)
        {
@@ -49,18 +49,22 @@ public class MP400 {
      
        
        PPMFile newPpmData;
+       PPMFile houghSpace;
        newPpmData = matrix.convolve(gaussian, ppmData);
        newPpmData = PPMConvolve.median(ppmData, 5);
        
        newPpmData = MPUtility.imageAdd(matrix.convolve(kSobelX, newPpmData), matrix.convolve(kSobelY, newPpmData));
-       //newPpmData= matrix.convolve(mexican, ppmData);
        newPpmData.threshold(5d);
+       HoughTransform houghTransform = new HoughTransform(newPpmData, 180);
+       
+       //newPpmData= matrix.convolve(mexican, ppmData);
 
        if(ppmData!=null)
        {
             //newFile.writePPM("original.ppm");
             newPpmData.writePPM("out.ppm");
             ppmData.writePPM("original.ppm");
+            houghTransform.manifestHoughSpace().writePPM("HOUGH.ppm");
             
        }
 
