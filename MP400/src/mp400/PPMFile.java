@@ -104,19 +104,10 @@ public class PPMFile {
         return outPixel;
     }
     
-    public void setAt(int xCoord, int yCoord, PixRGB inRGB, boolean wtf)
+    public void setAt(int xCoord, int yCoord, PixRGB inRGB)
     {
-       // System.out.println("Setting pixel @: " + xCoord+", "+yCoord );
-
         PixRGB newPixel = new PixRGB(inRGB);
-                
-        imageData[xCoord][yCoord] = newPixel;
-//        if(wtf) {
-//            System.out.println("MEOW " + xCoord+", "+yCoord+" = [" +inRGB.toString()+"]-> ["+getAt(xCoord, yCoord)+"]");
-//        }
-        //System.out.println(xCoord + " " + yCoord);
-        //this.imageData[xCoord][yCoord] = inRGB;
-        
+        imageData[xCoord][yCoord] = newPixel;   
     }
     
     public void threshold(double thresh)
@@ -141,7 +132,7 @@ public class PPMFile {
                     workingPixel.setG(0);
                     workingPixel.setB(0);
                 }
-                setAt(j, i, workingPixel, false);
+                setAt(j, i, workingPixel);
             }
         }
     }

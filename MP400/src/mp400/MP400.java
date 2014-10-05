@@ -24,74 +24,37 @@ public class MP400 {
        PPMFile ppmData = null;
        try
        {
-            ppmData = new PPMFile("/home/akeegazooka/Desktop/2.ppm");
+            ppmData = new PPMFile("/home/akeegazooka/Desktop/8.ppm");
        }
        catch(IOException e)
        {
            System.out.println(e.getMessage());
        }
-           
        
-
-    Double[][] gauss = 
-    { {1d, 2d, 1d},
-      {2d, 4d, 2d},
-      {1d, 2d, 1d}
-    };
-    Double[][] identity = 
-    { {0d, 0d, 0d},
-      {0d, 1d, 0d},
-      {0d, 0d, 0d}
-    };
-    Double[][] box =
-    { {1d, 1d, 1d},
-      {1d, 1d, 1d},
-      {1d, 1d, 1d}
-    };
-    Double[][] edge =
-    { {-1d, -1d, -1d},
-      {-1d, 8d, -1d},
-      {-1d, -1d, -1d}
-    };
-    Double[][] test =
-    { {0d, 0d, 0d},
-      {0d, 2d, 0d},
-      {0d, 0d, 0d}
-    };
-    Double[][] ident1 = 
-    { {0d, 0d, 0d},
-      {0d, 1d, 1d},
-      {0d, 0d, 0d}
-    };
-    Double[][] ident2 = 
-    { {0d, 1d, 0d},
-      {0d, 1d, 0d},
-      {0d, 0d, 0d}
-    };
-    Double[][] mexicanHat =
-    { { 0d, 0d,-1d,-1d,-1d, 0d, 0d},
-      { 0d,-1d,-3d,-3d,-3d,-1d, 0d},
-      {-1d,-3d, 0d, 7d, 0d,-3d,-1d},
-      {-1d,-3d, 7d,24d, 7d,-3d,-1d},
-      {-1d,-3d, 0d, 7d, 0d,-3d,-1d},
-      { 0d,-1d,-3d,-3d,-3d,-1d, 0d},
-      { 0d, 0d,-1d,-1d,-1d, 0d, 0d}
-    };
-    
        PPMConvolve matrix = new PPMConvolve();
-       Double[][] genGauss = matrix.generateGaussKernel(2.5d);
-       PixMask newMask = new PixMask(mexicanHat);
+       Double[][] genGauss = PPMConvolve.generateGaussKernel(2.5d);
+       
+       //mexican hat creation.
+       PixMask newMask = new PixMask(Extra.mexicanHat);
        PixMask mexican = matrix.normalizeMask(newMask);
        
+       //gaussian creation
        PixMask newMask1 = new PixMask(genGauss);
        PixMask gaussian = matrix.normalizeMask(newMask1);
+       
+       //sobel creation.
+       
+       PixMask kSobelX = matrix.normalizeMask(new PixMask(Extra.sobelX));
+       PixMask kSobelY = matrix.normalizeMask(new PixMask(Extra.sobelY));
      
        
        PPMFile newPpmData;
        newPpmData = matrix.convolve(gaussian, ppmData);
+       newPpmData = PPMConvolve.median(ppmData, 5);
        
-       newPpmData= matrix.convolve(mexican, ppmData);
-       newPpmData.threshold(8d);
+       newPpmData = MPUtility.imageAdd(matrix.convolve(kSobelX, newPpmData), matrix.convolve(kSobelY, newPpmData));
+       //newPpmData= matrix.convolve(mexican, ppmData);
+       newPpmData.threshold(5d);
 
        if(ppmData!=null)
        {
