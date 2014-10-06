@@ -7,6 +7,7 @@
 package mp400;
 
 import java.io.IOException;
+import static java.lang.Math.pow;
 import java.util.ArrayList;
 
 
@@ -24,7 +25,7 @@ public class MP400 {
        PPMFile ppmData = null;
        try
        {
-            ppmData = new PPMFile("/home/akeegazooka/Desktop/2.ppm");
+            ppmData = new PPMFile("/home/akeegazooka/Desktop/8.ppm");
        }
        catch(IOException e)
        {
@@ -58,10 +59,10 @@ public class MP400 {
        
        newPpmData = PPMConvolve.median(newPpmData, 5);
        HoughTransform houghTransform = new HoughTransform(newPpmData, 180, 0.5);
-       PolarLine[] lines = houghTransform.findViableLines(20, .5d);
-       //PolarLine[] goodLines = houghTransform.filterLines(lines);
+       PolarLine[] lines = houghTransform.findViableLines(20, .2d);
+       PolarLine[] goodLines = houghTransform.filterLines(lines, .26d, .15 * Math.sqrt(pow(newPpmData.dimensions.getX(),2) + Math.pow(newPpmData.dimensions.getY(), 2)));
        //newPpmData.drawLines(lines);
-       ppmData.drawLines(lines);
+       ppmData.drawLines(goodLines);
        
        //newPpmData= matrix.convolve(mexican, ppmData);
 

@@ -143,24 +143,47 @@ public class HoughTransform {
     {
         int accHeight = acc[0].length;
         double r = (double) (inR - accHeight/2);
-        System.out.println("---"+r);
+        //System.out.println("---"+r);
         double theta = (double) (inTheta * angleStep);
         //System.out.println("Viable polar line: " + r + ", " + theta);
         return new PolarLine(r, theta+0.001);
     }
-    
-    public PolarLine[] filterLines(PolarLine[] inLines)
+    //r 15%
+    //theta 15 .27
+    public PolarLine[] filterLines(PolarLine[] inLines, double thetaSimilarity, double rSimilarity )
     {
+        //                  if(Math.abs(thetaDiff) < restrainingOrderTheta
+        //                  && Math.abs(distDiff) < restrainingOrderDist) {
+        //                  isRestrained = true;
+        //                  double thetaDiff = theta - bestLineThetaList[bestI];
+        //                  double distDiff = dist - bestLineDistList[bestI];
         PolarLine[] goodLines;
         ArrayList<PolarLine> lineArray = new ArrayList<>();
-        for (PolarLine line : inLines) {
+        for (PolarLine line : inLines) 
+        {
             //System.out.println("---"+Math.abs(Math.abs(line.getTheta()) - Math.PI/2)+"---");
             if (Math.abs(Math.abs(line.getTheta()) - Math.PI/2) > .18)  //10 degrees from horizontal
             {
-                System.out.println(line.getR());
-//                if(line.getR() < )
-                //System.out.println("OK LINE");
-                lineArray.add(line);
+                if(lineArray.isEmpty())
+                    lineArray.add(line);
+                else
+                {
+                    boolean isSimilar = false;
+                    for(PolarLine newLine : lineArray)
+                    {
+                        double thetaDiff = Math.abs( newLine.getTheta() - line.getTheta() );
+                        double distDiff = Math.abs ( newLine.getR() - newLine.getR() );
+
+                        System.out.println("R1: " + newLine.getR() + " R2: " + line.getR() );
+
+                        if( (thetaDiff < thetaSimilarity) && (distDiff < rSimilarity) )
+                            isSimilar = true;
+                    }
+                    if(!isSimilar)
+                        lineArray.add(line);
+                }
+                
+                //System.out.println(line.getR());
             }        
         }
         
