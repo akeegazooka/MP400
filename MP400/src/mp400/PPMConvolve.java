@@ -42,8 +42,8 @@ public class PPMConvolve {
                 {
                     for(int kX = 0;kX<kWidth;kX++)
                     {
-                        int fetchX = clamp( (iX+kX - kWidth/2), 0, width-1 );
-                        int fetchY = clamp( (iY+kY - kHeight/2), 0, height-1);
+                        int fetchX = Extra.clampInt( (iX+kX - kWidth/2), 0, width-1 );
+                        int fetchY = Extra.clampInt( (iY+kY - kHeight/2), 0, height-1);
                         PixRGB  mulPixel = inImage.getAt(fetchX,fetchY);
                         newPix.r += mulPixel.r * inMask.kernel[kX][kY];
                         newPix.g += mulPixel.g * inMask.kernel[kX][kY];
@@ -59,12 +59,7 @@ public class PPMConvolve {
     }
   
     
-    private static int clamp(int val, int min, int max)
-    {
-        if(val < min) { return min; }
-        if(val > max) { return max; }
-        return val;
-}
+
     public PixMask normalizeMask(PixMask inMask)
     {
         PixMask normMask = new PixMask(inMask.kernel);
@@ -160,8 +155,8 @@ public class PPMConvolve {
                     for(int i = 0;i<mWidth;i++)
                     {
                         PixRGB tempPix = new PixRGB();
-                        int fetchX = clamp( (x+i - mWidth/2), 0, width-1 );
-                        int fetchY = clamp( (y+j - mHeight/2), 0, height-1);
+                        int fetchX = Extra.clampInt( (x+i - mWidth/2), 0, width-1 );
+                        int fetchY = Extra.clampInt( (y+j - mHeight/2), 0, height-1);
                         tempPix = inFile.getAt(fetchX, fetchY);
                         rSet[index] = tempPix.r;
                         gSet[index] = tempPix.g;

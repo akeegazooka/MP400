@@ -8,6 +8,9 @@
 package mp400;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -21,7 +24,7 @@ public class HoughTransform {
     //private MP2d [] pointMap;
     
     
-    public HoughTransform(PPMFile inImFile, int inPrecision)
+    public HoughTransform(PPMFile inImFile, int inPrecision, double startPercentage)
     {
         //dimensionality initializers/declarations
         MP2d dimensions = inImFile.getDimensions();
@@ -31,7 +34,7 @@ public class HoughTransform {
         MP2d centre = new MP2d(width/2,height/2);
         
         //angle related variables
-        double thetaPrecision = Math.PI / inPrecision;
+        angleStep = Math.PI / inPrecision;
         double[] sinCache = new double[inPrecision];
         double[] cosCache = new double[inPrecision];
         
@@ -41,13 +44,13 @@ public class HoughTransform {
         
         for(int i = 0;i<inPrecision;i++)
         {
-            double theta = i * thetaPrecision;
+            double theta = i * angleStep;
             sinCache[i] = Math.sin(theta);
             cosCache[i] = Math.cos(theta);
         }
         //pointMap = new MP2d[height * width];
         mostBinVotes = 0;
-        for(int yy = 0;yy<height;yy++)
+        for(int yy = (int) 0; yy<height;yy++)
         {
             for(int xx = 0; xx < width;xx++)
             {
@@ -69,6 +72,105 @@ public class HoughTransform {
                 
             }
         }
+    }
+    
+    public PolarLine[] findViableLines(int neighbourhoodSize, Double threshold)
+    {
+        PolarLine[] outLines;
+        int accWidth = acc.length;
+        int accHeight = acc[0].length;
+        
+        int[][] tempAcc = new int[accWidth][accHeight];
+        for(int ii = 0; ii < accWidth;ii++)
+        {
+            tempAcc[ii] = acc[ii].clone();
+        }
+        
+        //System.arraycopy(acc, 0, tempAcc, 0, acc.length);
+        int neighbourhoodCentre = neighbourhoodSize /2;
+        double minVotes = threshold * mostBinVotes;
+        
+        Map<Integer,MP2d> bestLines = new TreeMap<>(Collections.reverseOrder());
+        
+        for(int r = 0;r<accHeight;r++)
+        {
+            for(int t = 0;t<accWidth;t++)
+            {
+                int currBinVotes = tempAcc[t][r];
+                if(currBinVotes >= minVotes)
+                {
+                    int localMaximumVotes = 0;
+                    for(int i = 0;i<neighbourhoodSize;i++)
+                    {
+                        for(int j = 0;j<neighbourhoodSize;j++)
+                        {
+                            int fetchT = Extra.clampInt(t+i - neighbourhoodCentre, 0, accWidth-1);
+                            int fetchR = Extra.clampInt(r+j - neighbourhoodCentre, 0, accHeight-1);
+                            
+                            if(localMaximumVotes < tempAcc[fetchT][fetchR])
+                                localMaximumVotes = tempAcc[fetchT][fetchR];
+                        }
+                    }
+                    //not local max
+                    if(currBinVotes < localMaximumVotes)
+                        tempAcc[t][r] = 0;
+                    else
+                    {
+                        bestLines.put(currBinVotes, new MP2d(t,r));
+                        //insert into outlines
+                        //outLines = new PolarLine(t,r);
+                    }
+                }
+                else
+                    tempAcc[t][r] = 0;
+            }
+        }
+        
+        outLines = new PolarLine[bestLines.size()];
+        int idx = 0;
+        for(Map.Entry<Integer, MP2d> viableLine : bestLines.entrySet())
+        {
+            //System.out.println("Help me: "+ viableLine.getValue().toString());
+            MP2d val = new MP2d(viableLine.getValue());
+            outLines[idx] = getPolarLine(val.getX(), val.getY());
+            idx++;
+        }
+        
+        return outLines;
+    }
+    
+    public PolarLine getPolarLine(int inTheta, int inR)
+    {
+        int accHeight = acc[0].length;
+        double r = (double) (inR - accHeight/2);
+        System.out.println("---"+r);
+        double theta = (double) (inTheta * angleStep);
+        //System.out.println("Viable polar line: " + r + ", " + theta);
+        return new PolarLine(r, theta+0.001);
+    }
+    
+    public PolarLine[] filterLines(PolarLine[] inLines)
+    {
+        PolarLine[] goodLines;
+        ArrayList<PolarLine> lineArray = new ArrayList<>();
+        for (PolarLine line : inLines) {
+            //System.out.println("---"+Math.abs(Math.abs(line.getTheta()) - Math.PI/2)+"---");
+            if (Math.abs(Math.abs(line.getTheta()) - Math.PI/2) > .18)  //10 degrees from horizontal
+            {
+                System.out.println(line.getR());
+//                if(line.getR() < )
+                //System.out.println("OK LINE");
+                lineArray.add(line);
+            }        
+        }
+        
+        goodLines = new PolarLine[lineArray.size()];
+        for(int ii = 0;ii<goodLines.length;ii++)
+        {
+            goodLines[ii] = lineArray.get(ii);
+        }
+        return goodLines;
+        
     }
     
     public PPMFile manifestHoughSpace()

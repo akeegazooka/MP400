@@ -107,7 +107,8 @@ public class PPMFile {
     public void setAt(int xCoord, int yCoord, PixRGB inRGB)
     {
         PixRGB newPixel = new PixRGB(inRGB);
-        imageData[xCoord][yCoord] = newPixel;   
+        if ( ( (xCoord <= dimensions.getX()-1) && (yCoord <= dimensions.getY()-1) ) &&( (xCoord >= 0) && (yCoord >= 0) ) )
+            imageData[xCoord][yCoord] = newPixel;   
     }
     
     public void threshold(double thresh)
@@ -134,6 +135,83 @@ public class PPMFile {
                 }
                 setAt(j, i, workingPixel);
             }
+        }
+    }
+    
+    public void drawLines(PolarLine[] inLines)
+    {
+        int centreX = dimensions.getX()/2;
+        int centreY = dimensions.getY()/2;
+        
+        
+        for(int i = 0;i<inLines.length; i++)
+        {
+            MP2d lineBegin = new MP2d();
+            MP2d lineEnd = new MP2d();
+            //System.out.println("Hello, " + inLines[i].getTheta());
+            //System.out.println("HELP " + line.getTheta());
+            double tCos = Math.cos(inLines[i].getTheta());
+            double tSin = Math.sin(inLines[i].getTheta());
+            
+            //System.out.println("cos / sin val "+tCos +", " + tSin);
+            
+            
+            //find x,y at left edge of image
+            lineBegin.setX(0);
+            lineBegin.setY( (int) ( (  ( inLines[i].getR() -(-centreX * tCos) ) / tSin) + centreY ) );
+            
+            lineEnd.setX(dimensions.getX());
+            lineEnd.setY( (int) ( ( ( inLines[i].getR() - ( (dimensions.getX()-1 - centreX) * tCos) ) / tSin) + centreY ));
+            //            (int) ( ( ( inLines[i].getR() - ( (dimensions.getX()-1 - centreX) * tCos) ) / tSin) + centreY );
+            
+           // System.out.println("Feeding: Line begin: "+ lineBegin.getX() +", " + lineBegin.getY() +"\nLine End: " + lineEnd.getX() +", " + lineEnd.getY());
+            bresenhamLine(lineBegin.getX(), lineBegin.getY(), lineEnd.getX(), lineEnd.getY(), new PixRGB(255,0,0));
+            
+            //lineBegin.setY( (int) (line.getR() * Math.sin(line.getTheta())));
+            
+            //find x,y at right edge of image
+        }
+    }
+    
+    
+    public void bresenhamLine(int x1,int y1, int x2, int y2, PixRGB colour)
+    {
+        if((x1==x2) && (y1==y2))
+            setAt(x1, y1, colour);
+        else
+        {
+            int dx = Math.abs(x2 - x1);
+            int dy = Math.abs(y2 - y1);
+            int diff = dx - dy;
+            int shiftX,shiftY;
+            
+            if(x1 < x2) 
+                shiftX = 1;
+            else
+                shiftX = -1;
+            if(y1 < y2)
+                shiftY = 1;
+            else
+                shiftY = -1;
+            
+            while((x1 != x2 ) || (y1 != y2))
+            {
+                int p = 2 * diff;
+                
+                if(p > -dy)
+                {
+                    diff-=dy;
+                    x1+=shiftX;
+                }
+                if(p < dx)
+                {
+                    diff+=dx;
+                    y1+=shiftY;
+                }
+                //System.out.println("Setting at " + x1+", " + y1);
+                setAt(x1, y1, colour);
+            }
+            
         }
     }
     

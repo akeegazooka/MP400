@@ -68,4 +68,20 @@ public class Extra {
       {-1d, 0d, 1d}
     };
     
+    public static int clampInt(int val, int min, int max)
+    {
+        if(val < min) { return min; }
+        if(val > max) { return max; }
+        return val;
+    }
+    
+    public static double clampDouble(double val, double min, double max)
+    {
+        if(val < min) { return min; }
+        if(val > max) { return max; }
+        return val;
+    }
+    
+    
+    
 }

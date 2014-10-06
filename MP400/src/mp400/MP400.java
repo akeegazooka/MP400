@@ -24,7 +24,7 @@ public class MP400 {
        PPMFile ppmData = null;
        try
        {
-            ppmData = new PPMFile("/home/akeegazooka/Desktop/9.ppm");
+            ppmData = new PPMFile("/home/akeegazooka/Desktop/2.ppm");
        }
        catch(IOException e)
        {
@@ -32,15 +32,15 @@ public class MP400 {
        }
        
        PPMConvolve matrix = new PPMConvolve();
-       Double[][] genGauss = PPMConvolve.generateGaussKernel(2.5d);
+       //Double[][] genGauss = PPMConvolve.generateGaussKernel(2.5d);
        
        //mexican hat creation.
-       PixMask newMask = new PixMask(Extra.mexicanHat);
-       PixMask mexican = matrix.normalizeMask(newMask);
+       //PixMask newMask = new PixMask(Extra.mexicanHat);
+       //PixMask mexican = matrix.normalizeMask(newMask);
        
        //gaussian creation
-       PixMask newMask1 = new PixMask(genGauss);
-       PixMask gaussian = matrix.normalizeMask(newMask1);
+       //PixMask newMask1 = new PixMask(genGauss);
+       //PixMask gaussian = matrix.normalizeMask(newMask1);
        
        //sobel creation.
        
@@ -50,12 +50,18 @@ public class MP400 {
        
        PPMFile newPpmData;
        PPMFile houghSpace;
-       newPpmData = matrix.convolve(gaussian, ppmData);
-       newPpmData = PPMConvolve.median(ppmData, 5);
        
+       newPpmData = PPMConvolve.median(ppmData, 5);
+       //newPpmData = PPMConvolve.median(ppmData, 5);
        newPpmData = MPUtility.imageAdd(matrix.convolve(kSobelX, newPpmData), matrix.convolve(kSobelY, newPpmData));
        newPpmData.threshold(5d);
-       HoughTransform houghTransform = new HoughTransform(newPpmData, 180);
+       
+       newPpmData = PPMConvolve.median(newPpmData, 5);
+       HoughTransform houghTransform = new HoughTransform(newPpmData, 180, 0.5);
+       PolarLine[] lines = houghTransform.findViableLines(20, .5d);
+       //PolarLine[] goodLines = houghTransform.filterLines(lines);
+       //newPpmData.drawLines(lines);
+       ppmData.drawLines(lines);
        
        //newPpmData= matrix.convolve(mexican, ppmData);
 
