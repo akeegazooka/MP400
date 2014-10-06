@@ -60,7 +60,7 @@ public class MP400 {
        newPpmData = PPMConvolve.median(newPpmData, 5);
        HoughTransform houghTransform = new HoughTransform(newPpmData, 180, 0.5);
        PolarLine[] lines = houghTransform.findViableLines(20, .2d);
-       PolarLine[] goodLines = houghTransform.filterLines(lines, .26d, .15 * Math.sqrt(pow(newPpmData.dimensions.getX(),2) + Math.pow(newPpmData.dimensions.getY(), 2)));
+       PolarLine[] goodLines = houghTransform.filterLines(lines, .3, .4 * Math.sqrt(pow(newPpmData.dimensions.getX(),2) + Math.pow(newPpmData.dimensions.getY(), 2)));
        //newPpmData.drawLines(lines);
        ppmData.drawLines(goodLines);
        

@@ -172,14 +172,17 @@ public class HoughTransform {
                     for(PolarLine newLine : lineArray)
                     {
                         double thetaDiff = Math.abs( newLine.getTheta() - line.getTheta() );
-                        double distDiff = Math.abs ( newLine.getR() - newLine.getR() );
+                        double distDiff = Math.abs ( newLine.getR() - line.getR() );
 
-                        System.out.println("R1: " + newLine.getR() + " R2: " + line.getR() );
+                        System.out.println("R1: " + newLine.getR() + "\nR2: " + line.getR() + "\nR Threshold: "+rSimilarity + "\nR diff: " + distDiff + "\nTheta threshold: " + thetaSimilarity + "\nTheta Diff: " + thetaDiff );
 
-                        if( (thetaDiff < thetaSimilarity) && (distDiff < rSimilarity) )
+                        if( (thetaDiff <= thetaSimilarity) && (distDiff <= rSimilarity) )
+                        {
+                            System.out.println("TOO SIMILAR");
                             isSimilar = true;
+                        }
                     }
-                    if(!isSimilar)
+                    if( (!isSimilar) && (lineArray.size() < 3))
                         lineArray.add(line);
                 }
                 
