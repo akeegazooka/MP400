@@ -16,7 +16,7 @@ import java.util.Map;
 public class ConnectedComponents
 {
 
-    public static Map<Integer, Blob> blobImage(PPMFile inImage, double minBlobRatio)
+    public static Map<Integer, Blob> blobImage(PPMFile inImage, double minBlobRatio, String pass)
     {
         int width = inImage.dimensions.getX();
         int height = inImage.dimensions.getY();
@@ -114,22 +114,18 @@ public class ConnectedComponents
                     }
                     else
                     {
-                        newBlob = new Blob();
+                        newBlob = new Blob(pass);
                         newBlob.activePixels.add( new MP2d(xx,yy) );
                         blobs.put(workingLabel, newBlob);
                     }
                  }
              }
          }
+         for(Map.Entry<Integer,Blob> blob: blobs.entrySet())
+         {
+             blob.getValue().classifyBlob(inImage);
+         }
          System.out.println("Finished blob processing, found " + blobs.size() +" Areas");
-         
-//        for(int ii = 0; ii < blobLabels[0].length;ii++)
-//        {
-//            for(int jj = 0; jj < blobLabels.length;jj++)
-//            {
-//                System.out.println("[" + jj + ", " + ii + "] " + blobLabels[jj][ii]);
-//            }
-//        }
         
         return blobs;
     }

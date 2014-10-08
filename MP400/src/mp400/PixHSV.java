@@ -97,14 +97,14 @@ public class PixHSV extends pixAbstract
         else if( (inHSV.getHue() <= 120) && (inHSV.getHue() < 180) )
         {
             //0,c,x
-            rPrime = 0;
+            rPrime = 0d;
             gPrime = c;
             bPrime = x;
         }
         else if( (inHSV.getHue() <= 180) && (inHSV.getHue() < 240) )
         {
             //0,x,c
-            rPrime = 0;
+            rPrime = 0d;
             gPrime = c;
             bPrime = x;
         }
@@ -112,14 +112,14 @@ public class PixHSV extends pixAbstract
         {
             //x,0,c
             rPrime = x;
-            gPrime = 0;
+            gPrime = 0d;
             bPrime = c;
         }
         else if( (inHSV.getHue() <= 300) && (inHSV.getHue() < 360) )
         {
             //c,0,x
             rPrime = c;
-            gPrime = 0;
+            gPrime = 0d;
             bPrime = x;
         }
         

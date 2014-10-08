@@ -84,6 +84,7 @@ public class MP400 {
        else if (task == 2)
        {
            PPMFile task2PPM = new PPMFile(ppmData);
+           
            task2PPM.writePPM("OriginalTask2.ppm");
            task2PPM = PPMConvolve.median(task2PPM, 5);
            
@@ -92,24 +93,36 @@ public class MP400 {
            //background removal run
            task2PPM.removeColour(new PixHSV(10d, 0.05d, 0.2d),new PixHSV(52d, 0.25d, 0.95d), new PixRGB(0,0,0), true);
            task2PPM.writePPM("No_BG.ppm");
+           
            //Yellow/Orange range run
-           //task2PPM.removeColour(new PixHSV(30d, .82d, .42d),new PixHSV(52d, 1d, .92d), new PixRGB(255,255,255), false);
-           //blobs.putAll( ConnectedComponents.blobImage(task2PPM, 0.001));
-           //task2PPM.writePPM("Yellow_Orange.ppm");
+           PPMFile orange_yellow = new PPMFile(task2PPM);
+           orange_yellow.removeColour(new PixHSV(30d, .82d, .42d),new PixHSV(52d, 1d, .92d), new PixRGB(255,255,255), false);
+           blobs.putAll( ConnectedComponents.blobImage(orange_yellow, 0.001, "orange_yellow"));
+           orange_yellow.writePPM("Yellow_Orange.ppm");
            
            //darker blue run
-           //task2PPM.removeColour(new PixHSV(180d, .85d, .15d),new PixHSV(235d, 1d, .58d), new PixRGB(255,255,255), false);
-           //task2PPM.writePPM("Blue.ppm");
+           PPMFile dark_blue = new PPMFile(task2PPM);
+           dark_blue.removeColour(new PixHSV(180d, .85d, .15d),new PixHSV(235d, 1d, .58d), new PixRGB(255,255,255), false);
+           blobs.putAll( ConnectedComponents.blobImage(dark_blue, 0.001, "dark_blue"));
+           dark_blue.writePPM("Blue.ppm");
            
            //lighter blue run
-           task2PPM.removeColour(new PixHSV(180d, .05d, 0.25d),new PixHSV(250d, 0.5d, .4d), new PixRGB(255,255,255), false);
-           task2PPM.writePPM("Light_Blue.ppm");
-           
-           //360 * label / labelSpace.size
+           PPMFile light_blue = new PPMFile(task2PPM);
+           light_blue.removeColour(new PixHSV(150d, 0d, 0.21d),new PixHSV(250d, 0.5d, .4d), new PixRGB(255,255,255), false);
+           blobs.putAll( ConnectedComponents.blobImage(light_blue, 0.001, "light_blue"));
+           light_blue.writePPM("Light_Blue.ppm");
            
            //purple
-           
+           PPMFile purple = new PPMFile(task2PPM);
+           purple.removeColour(new PixHSV(319, .42d, .1d),new PixHSV(355d, .92, .57d), new PixRGB(255,255,255), false);
+           blobs.putAll( ConnectedComponents.blobImage(purple, 0.001,"purple"));
+           purple.writePPM("Purple.ppm");
+
            //brown
+           PPMFile brown = new PPMFile(task2PPM);
+           brown.removeColour(new PixHSV(29, .6d, .18d),new PixHSV(43d, .95, .72d), new PixRGB(255,255,255), false);
+           blobs.putAll( ConnectedComponents.blobImage(brown, 0.001, "brown"));
+           brown.writePPM("Brown.ppm");
            
            
            

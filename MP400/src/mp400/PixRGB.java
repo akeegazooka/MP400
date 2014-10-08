@@ -79,17 +79,23 @@ public class PixRGB extends pixAbstract {
         double h = 0;
         if(cMax == rPrime)
         {
-            h = ( ((gPrime - bPrime)/deltaC) % 6 );
+            h = ( ( (gPrime - bPrime)/deltaC) % 6 );
+            //System.out.println("calc [" + h + " delta: " +deltaC + "] " + "\ngprime "+ gPrime + " bPrime "+bPrime + "gPrime - bPrime: ["+(gPrime-bPrime)+"]" );
         }
         else if(cMax == gPrime)
         {
-            h =  ( (bPrime - rPrime)/deltaC) + 2d;
+            h =  ( ( (bPrime - rPrime)/deltaC) + 2d);
+            //System.out.println("Calulating at cMax = gPrime");
         }
         else if(cMax == bPrime)
         {
-            h = ((rPrime - gPrime) / deltaC) + 4d;
+            h = (((rPrime - gPrime) / deltaC) + 4d);
+            //System.out.println("Calulating at cMax = bPrime");
         }
+        
         h*=60d;
+        if(h <= 0)
+            h+= 360;
         
         double s = 0;
         
