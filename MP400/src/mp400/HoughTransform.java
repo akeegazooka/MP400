@@ -152,11 +152,7 @@ public class HoughTransform {
     //theta 15 .27
     public PolarLine[] filterLines(PolarLine[] inLines, double thetaSimilarity, double rSimilarity )
     {
-        //                  if(Math.abs(thetaDiff) < restrainingOrderTheta
-        //                  && Math.abs(distDiff) < restrainingOrderDist) {
-        //                  isRestrained = true;
-        //                  double thetaDiff = theta - bestLineThetaList[bestI];
-        //                  double distDiff = dist - bestLineDistList[bestI];
+
         PolarLine[] goodLines;
         ArrayList<PolarLine> lineArray = new ArrayList<PolarLine>();
         for (PolarLine line : inLines) 

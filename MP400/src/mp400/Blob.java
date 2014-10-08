@@ -16,8 +16,9 @@ public class Blob
     
     private double boundingBoxArea;
     private double blobDensity;
-    private double blobWidth;
-    private double blobHeight;
+    private int blobWidth;
+    private int blobHeight;
+    private int blobFileOffset; 
     
     private int numPixels;
     
@@ -29,7 +30,7 @@ public class Blob
     
     ArrayList<MP2d> activePixels;
     
-    public Blob(String inPass) 
+    public Blob(String inPass, int inOffset) 
     {
 
         
@@ -44,6 +45,8 @@ public class Blob
         
         blobWidth = 0;
         blobHeight = 0;
+        
+        blobFileOffset = inOffset;
         
         pass = inPass;
     }
@@ -98,6 +101,35 @@ public class Blob
         
         //finding the density (fullness) of the blob in relation to its bounding box
         
+        blobDensity = (activePixels.size() / boundingBoxArea);
+        
+        PPMFile blobOut = new PPMFile(blobWidth, blobHeight, 255, "P3");
+        //System.out.println("top left: " + topLeft.getX() +", " + topLeft.getY());
+        //PixRGB outPix = inImage.getAt(481, 111);
+//        for(int xx = 0; xx<inImage.dimensions.getX();xx++)
+//        {
+//            for(int yy = 0; yy<inImage.dimensions.getY();yy++)
+//            {
+//                PixRGB outPix = inImage.getAt(xx, yy);
+//                System.out.println(xx+", "+yy +" ["+outPix.getR()+", " + outPix.getG()+", " +outPix.getB()+"]");
+//            }
+//        }
+        for(int xx = topLeft.getX(); xx < bottomRight.getX();xx++)
+        {
+            for(int yy = topLeft.getY(); yy < bottomRight.getY();yy++)
+            {
+                PixRGB settingPixel = new PixRGB(inImage.getAt(xx, yy));
+                blobOut.setAt(xx-topLeft.getX(), yy-topLeft.getY(), settingPixel);
+            }
+        }
+        for(MP2d active : activePixels)
+        {
+            PixRGB settingPixel = new PixRGB(inImage.getAt(active.getX(), active.getY()));
+            int setPositionX = active.getX() - topLeft.getX();
+            int setPositionY = active.getY() - topLeft.getY();
+            blobOut.setAt(setPositionX, setPositionY, settingPixel);
+        }
+        blobOut.writePPM("blob-"+pass+"-"+blobFileOffset+".ppm");
         
         
     }

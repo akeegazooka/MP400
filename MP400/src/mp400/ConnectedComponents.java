@@ -16,10 +16,10 @@ import java.util.Map;
 public class ConnectedComponents
 {
 
-    public static Map<Integer, Blob> blobImage(PPMFile inImage, double minBlobRatio, String pass)
+    public static Map<Integer, Blob> blobImage(PPMFile bwImage, PPMFile colourImage, double minBlobRatio, String pass)
     {
-        int width = inImage.dimensions.getX();
-        int height = inImage.dimensions.getY();
+        int width = bwImage.dimensions.getX();
+        int height = bwImage.dimensions.getY();
         
         //pass one
         int[][] blobLabels =  new int[width][height];
@@ -31,7 +31,7 @@ public class ConnectedComponents
         {
             for (int xx = 0; xx < width; xx++)
             {
-                PixRGB currPix = inImage.getAt(xx, yy);
+                PixRGB currPix = bwImage.getAt(xx, yy);
                 
                 if( (int) (currPix.getR()) != 0)
                 {
@@ -99,6 +99,7 @@ public class ConnectedComponents
             }
         }
          Map<Integer, Blob> blobs = new HashMap<Integer, Blob>();
+         int blobFileOffset = 0;
          for(int yy = 0;yy< height; yy++)
          {
              for(int xx = 0; xx < width; xx++)
@@ -114,17 +115,18 @@ public class ConnectedComponents
                     }
                     else
                     {
-                        newBlob = new Blob(pass);
+                        newBlob = new Blob(pass, blobFileOffset);
+                        blobFileOffset++;
                         newBlob.activePixels.add( new MP2d(xx,yy) );
                         blobs.put(workingLabel, newBlob);
                     }
                  }
              }
          }
-         for(Map.Entry<Integer,Blob> blob: blobs.entrySet())
-         {
-             blob.getValue().classifyBlob(inImage);
-         }
+//         for(Map.Entry<Integer,Blob> blob: blobs.entrySet())
+//         {
+//             blob.getValue().classifyBlob(colourImage);
+//         }
          System.out.println("Finished blob processing, found " + blobs.size() +" Areas");
         
         return blobs;
