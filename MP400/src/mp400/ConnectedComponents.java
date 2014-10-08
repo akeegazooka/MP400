@@ -16,17 +16,20 @@ import java.util.Map;
 public class ConnectedComponents
 {
 
-    public static int [][] label(PPMFile inImage)
+    public static Map<Integer, Blob> blobImage(PPMFile inImage, double minBlobRatio)
     {
+        int width = inImage.dimensions.getX();
+        int height = inImage.dimensions.getY();
+        
         //pass one
-        int[][] blobLabels =  new int[inImage.dimensions.getX()][inImage.dimensions.getY()];
+        int[][] blobLabels =  new int[width][height];
         //ArrayList<MP2d> equivalenceRelations = new ArrayList<>();
-        Map<Integer, Integer> equivalenceRelations = new HashMap<>();
+        Map<Integer, Integer> equivalenceRelations = new HashMap<Integer,Integer>();
         
         int currLabel = 1;
-        for(int yy = 0; yy<inImage.dimensions.getY(); yy++)
+        for(int yy = 0; yy< height; yy++)
         {
-            for (int xx = 0; xx < inImage.dimensions.getX(); xx++)
+            for (int xx = 0; xx < width; xx++)
             {
                 PixRGB currPix = inImage.getAt(xx, yy);
                 
@@ -95,7 +98,30 @@ public class ConnectedComponents
                 }
             }
         }
-         Map<Integer, Blob> blobs = new HashMap<>();
+         Map<Integer, Blob> blobs = new HashMap<Integer, Blob>();
+         for(int yy = 0;yy< height; yy++)
+         {
+             for(int xx = 0; xx < width; xx++)
+             {
+                 int workingLabel = blobLabels[xx][yy];
+                 if( (workingLabel != 0) && (numBlobPixels[workingLabel] /  (double)(width * height) > minBlobRatio)  )
+                 {
+                    Blob newBlob;
+                    if(blobs.containsKey(workingLabel))
+                    {
+                        newBlob = blobs.get(workingLabel);
+                        newBlob.activePixels.add(new MP2d(xx,yy));
+                    }
+                    else
+                    {
+                        newBlob = new Blob();
+                        newBlob.activePixels.add( new MP2d(xx,yy) );
+                        blobs.put(workingLabel, newBlob);
+                    }
+                 }
+             }
+         }
+         System.out.println("Finished blob processing, found " + blobs.size() +" Areas");
          
 //        for(int ii = 0; ii < blobLabels[0].length;ii++)
 //        {
@@ -105,6 +131,6 @@ public class ConnectedComponents
 //            }
 //        }
         
-        return blobLabels;
+        return blobs;
     }
 }

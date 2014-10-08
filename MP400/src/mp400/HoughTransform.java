@@ -90,7 +90,7 @@ public class HoughTransform {
         int neighbourhoodCentre = neighbourhoodSize /2;
         double minVotes = threshold * mostBinVotes;
         
-        Map<Integer,MP2d> bestLines = new TreeMap<>(Collections.reverseOrder());
+        Map<Integer,MP2d> bestLines = new TreeMap<Integer,MP2d>(Collections.reverseOrder());
         
         for(int r = 0;r<accHeight;r++)
         {
@@ -158,7 +158,7 @@ public class HoughTransform {
         //                  double thetaDiff = theta - bestLineThetaList[bestI];
         //                  double distDiff = dist - bestLineDistList[bestI];
         PolarLine[] goodLines;
-        ArrayList<PolarLine> lineArray = new ArrayList<>();
+        ArrayList<PolarLine> lineArray = new ArrayList<PolarLine>();
         for (PolarLine line : inLines) 
         {
             //System.out.println("---"+Math.abs(Math.abs(line.getTheta()) - Math.PI/2)+"---");
@@ -211,7 +211,7 @@ public class HoughTransform {
             {
                // System.out.println(acc[j][i]);
                 //System.out.println( (double) (acc[j][i]) /mostBinVotes * 255) ;
-                Double v = new Double(acc[j][i]) / mostBinVotes*255.d;
+                Double v = (double) acc[j][i] / mostBinVotes*255.d; //maybe broken
                 PixRGB pixel = new PixRGB(v,v,v);
                 //System.out.println(pixel.r +", "+pixel.g+", "+pixel.b);
                 outHoughSpaceImage.setAt(j, i, pixel);

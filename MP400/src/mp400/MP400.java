@@ -9,6 +9,8 @@ package mp400;
 import java.io.IOException;
 import static java.lang.Math.pow;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -84,21 +86,33 @@ public class MP400 {
            PPMFile task2PPM = new PPMFile(ppmData);
            task2PPM.writePPM("OriginalTask2.ppm");
            task2PPM = PPMConvolve.median(task2PPM, 5);
+           
+           Map<Integer,Blob> blobs = new HashMap<Integer,Blob>();
+           
+           //background removal run
            task2PPM.removeColour(new PixHSV(10d, 0.05d, 0.2d),new PixHSV(52d, 0.25d, 0.95d), new PixRGB(0,0,0), true);
-           task2PPM.removeColour(new PixHSV(30d, .82d, .42d),new PixHSV(52d, 1d, .92d), new PixRGB(255,255,255), false);
-           int[][] labelSpace = ConnectedComponents.label(task2PPM);
-           for(int ii = 0; ii < labelSpace[0].length;ii++)
-           {
-               for(int jj = 0; jj < labelSpace.length;jj++)
-               {
-                   System.out.println("Label: " + labelSpace[jj][ii]);
-                   //task2PPM.setAt(jj, ii, PixHSV.convertToRGB( new PixHSV ( (360 * labelSpace[jj][ii]/ labelSpace.length * labelSpace[0].length) ,5,.5) ));
-               }
-           }
+           task2PPM.writePPM("No_BG.ppm");
+           //Yellow/Orange range run
+           //task2PPM.removeColour(new PixHSV(30d, .82d, .42d),new PixHSV(52d, 1d, .92d), new PixRGB(255,255,255), false);
+           //blobs.putAll( ConnectedComponents.blobImage(task2PPM, 0.001));
+           //task2PPM.writePPM("Yellow_Orange.ppm");
+           
+           //darker blue run
+           //task2PPM.removeColour(new PixHSV(180d, .85d, .15d),new PixHSV(235d, 1d, .58d), new PixRGB(255,255,255), false);
+           //task2PPM.writePPM("Blue.ppm");
+           
+           //lighter blue run
+           task2PPM.removeColour(new PixHSV(180d, .05d, 0.25d),new PixHSV(250d, 0.5d, .4d), new PixRGB(255,255,255), false);
+           task2PPM.writePPM("Light_Blue.ppm");
+           
            //360 * label / labelSpace.size
            
+           //purple
            
-           task2PPM.writePPM("task2.ppm");
+           //brown
+           
+           
+           
        }
 
        
