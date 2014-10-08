@@ -8,7 +8,6 @@ package mp400;
 
 import java.io.IOException;
 import static java.lang.Math.pow;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public class MP400 {
        PPMFile ppmData = null;
        try
        {
-            ppmData = new PPMFile("/home/akeegazooka/Desktop/task2/Combos-016.ppm");
+            ppmData = new PPMFile("/home/akeegazooka/Desktop/task2/PurpleDome-001.ppm");
        }
        catch(IOException e)
        {
@@ -50,8 +49,8 @@ public class MP400 {
 
             //sobel creation.
 
-            PixMask kSobelX = matrix.normalizeMask(new PixMask(Extra.sobelX));
-            PixMask kSobelY = matrix.normalizeMask(new PixMask(Extra.sobelY));
+            PixMask kSobelX = PPMConvolve.normalizeMask(new PixMask(Extra.sobelX));
+            PixMask kSobelY = PPMConvolve.normalizeMask(new PixMask(Extra.sobelY));
 
 
             PPMFile newPpmData;
@@ -59,7 +58,7 @@ public class MP400 {
 
             newPpmData = PPMConvolve.median(ppmData, 5);
             //newPpmData = PPMConvolve.median(ppmData, 5);
-            newPpmData = MPUtility.imageAdd(matrix.convolve(kSobelX, newPpmData), matrix.convolve(kSobelY, newPpmData));
+            newPpmData = MPUtility.imageAdd(PPMConvolve.convolve(kSobelX, newPpmData), PPMConvolve.convolve(kSobelY, newPpmData));
             newPpmData.threshold(5d);
 
             newPpmData = PPMConvolve.median(newPpmData, 5);
@@ -95,7 +94,7 @@ public class MP400 {
            task2PPM.removeColour(new PixHSV(10d, 0.05d, 0.2d),new PixHSV(52d, 0.25d, 0.95d), new PixRGB(0,0,0), true);
            task2PPM.writePPM("No_BG.ppm");
            
-           //Yellow/Orange range run
+           /*//Yellow/Orange range run
            PPMFile orange_yellow = new PPMFile(task2PPM);
            orange_yellow.removeColour(new PixHSV(30d, .82d, .42d),new PixHSV(52d, 1d, .92d), new PixRGB(255,255,255), false);
            blobs.putAll( ConnectedComponents.blobImage(orange_yellow,colourImage, 0.001, "orange_yellow"));
@@ -109,26 +108,52 @@ public class MP400 {
            
            //lighter blue run
            PPMFile light_blue = new PPMFile(task2PPM);
-           light_blue.removeColour(new PixHSV(150d, 0d, 0.21d),new PixHSV(250d, 0.5d, .4d), new PixRGB(255,255,255), false);
+           light_blue.removeColour(new PixHSV(90d, 0d, 0.21d),new PixHSV(250d, 0.5d, .53d), new PixRGB(255,255,255), false);
+           light_blue = PPMConvolve.maxFilter(light_blue, 5);
            blobs.putAll( ConnectedComponents.blobImage(light_blue,colourImage, 0.001, "light_blue"));
-           light_blue.writePPM("Light_Blue.ppm");
+           light_blue.writePPM("Light_Blue.ppm");*/
            
            //purple
            PPMFile purple = new PPMFile(task2PPM);
            purple.removeColour(new PixHSV(319, .42d, .1d),new PixHSV(355d, .92, .57d), new PixRGB(255,255,255), false);
            blobs.putAll( ConnectedComponents.blobImage(purple,colourImage, 0.001,"purple"));
            purple.writePPM("Purple.ppm");
+           
+           
 
-           //brown
+           /*//amazon_brown
            PPMFile brown = new PPMFile(task2PPM);
            brown.removeColour(new PixHSV(29, .6d, .18d),new PixHSV(43d, .95, .72d), new PixRGB(255,255,255), false);
-           blobs.putAll( ConnectedComponents.blobImage(brown,colourImage, 0.001, "brown"));
-           brown.writePPM("Brown.ppm");
+           blobs.putAll( ConnectedComponents.blobImage(brown,colourImage, 0.001, "amazon_brown"));
+           brown.writePPM("Amazon_Brown.ppm");
+           
+           //totoro brown
+ 
+           PPMFile totoro_brown = new PPMFile(task2PPM);
+           //new PixHSV(28, .28d, .15d),new PixHSV(45d, .55, .55d)
+           totoro_brown.removeColour(new PixHSV(24, .30d, 0d),new PixHSV(45d, .7, .6d), new PixRGB(255,255,255), false);
+           blobs.putAll( ConnectedComponents.blobImage(totoro_brown,colourImage, 0.001, "totoro_brown"));
+           totoro_brown.writePPM("Totoro_Brown.ppm");*/
+           
            
            for(Map.Entry<Integer,Blob> blob: blobs.entrySet())
            {
                blob.getValue().classifyBlob(colourImage);
            }
+           Blob bestPurpleBlob = FindStuff.findPurpleDisk(blobs);
+           //task2PPM.writePPM("uhhh.ppm");
+           bestPurpleBlob.writeOut(ppmData);
+           
+           //Purple Dome 000
+           //Average Pixel : [326, 0.80, 0.28]
+           //Bounding Box Area: 5325
+           //Blob Density: 0.22
+           
+           //Combos 16
+           //Average pixel: [326, 0.799, 0.368]
+           //Bounding Box Area: 5293
+           //Blob Density: 0.28
+           
            
            
            

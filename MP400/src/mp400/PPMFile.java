@@ -194,8 +194,6 @@ public class PPMFile {
         {
             MP2d lineBegin = new MP2d();
             MP2d lineEnd = new MP2d();
-            //System.out.println("Hello, " + inLines[i].getTheta());
-            //System.out.println("HELP " + line.getTheta());
             double tCos = Math.cos(inLines[i].getTheta());
             double tSin = Math.sin(inLines[i].getTheta());
             
@@ -208,14 +206,8 @@ public class PPMFile {
             
             lineEnd.setX(dimensions.getX());
             lineEnd.setY( (int) ( ( ( inLines[i].getR() - ( (dimensions.getX()-1 - centreX) * tCos) ) / tSin) + centreY ));
-            //            (int) ( ( ( inLines[i].getR() - ( (dimensions.getX()-1 - centreX) * tCos) ) / tSin) + centreY );
-            
-           // System.out.println("Feeding: Line begin: "+ lineBegin.getX() +", " + lineBegin.getY() +"\nLine End: " + lineEnd.getX() +", " + lineEnd.getY());
+
             bresenhamLine(lineBegin.getX(), lineBegin.getY(), lineEnd.getX(), lineEnd.getY(), new PixRGB(255,0,0));
-            
-            //lineBegin.setY( (int) (line.getR() * Math.sin(line.getTheta())));
-            
-            //find x,y at right edge of image
         }
     }
     

@@ -21,7 +21,7 @@ public class PPMConvolve {
     PixMask mask;
     PixMask normalMask;
     
-    public PPMFile convolve(PixMask inMask, PPMFile inImage)
+    public static PPMFile convolve(PixMask inMask, PPMFile inImage)
     {
         //PPMFile imageOut = new PPMFile(inImage);
         System.out.println("Dimensions " + inImage.dimensions.getX() + " " + inImage.dimensions.getY());
@@ -60,7 +60,7 @@ public class PPMConvolve {
   
     
 
-    public PixMask normalizeMask(PixMask inMask)
+    public static PixMask normalizeMask(PixMask inMask)
     {
         PixMask normMask = new PixMask(inMask.kernel);
         double runningTotal = 0;
@@ -82,7 +82,7 @@ public class PPMConvolve {
         
         return normMask;
     }
-    private PixRGB pixAbs(PixRGB inPix)
+    private static PixRGB pixAbs(PixRGB inPix)
     {
         inPix.setR(Math.abs(inPix.getR()));
         inPix.setG(Math.abs(inPix.getG()));
@@ -183,13 +183,52 @@ public class PPMConvolve {
                 imageOut.setAt(x, y, new PixRGB(rMedian,gMedian,bMedian));
             }
         }
-        
-
-            
-        
-        
-        
         return imageOut;
         
     }
+    
+    public static PPMFile maxFilter(PPMFile inImage, int neighbourHoodSize)
+    {
+        int height = inImage.dimensions.getY();
+        int width = inImage.dimensions.getX();
+        
+        int nHeight = neighbourHoodSize;
+        int nWidth = neighbourHoodSize;
+        
+        PPMFile outResult = new PPMFile(inImage);
+        for (int yy = 0; yy < height;yy++)
+        {
+            for(int xx = 0; xx < width;xx++)
+            {
+                double maxHue = 0;
+                double maxSat = 0;
+                double maxVal = 0;
+                PixHSV maxPixel;
+                
+                for(int y = 0; y < nHeight;y++)
+                {
+                    for(int x = 0; x < nWidth;x++)
+                    {
+                        //System.out.println("uh.");
+                        //int fetchX = Extra.clampInt( (x+i - mWidth/2), 0, width-1 );
+                        int fetchX = Extra.clampInt(xx + x - nWidth/2, 0, width-1);
+                        int fetchY = Extra.clampInt(yy+ y - nHeight/2, 0, height-1);
+                        PixHSV tempPix = PixRGB.convertToHSV(inImage.getAt(fetchX, fetchY));
+                        
+                        if(tempPix.getHue() > maxHue)
+                            maxHue = tempPix.getHue();
+                        if(tempPix.getSat() > maxSat )
+                            maxSat = tempPix.getSat();
+                        if(tempPix.getVal() > maxVal)
+                            maxVal = tempPix.getVal();
+                    }
+                }
+                
+                maxPixel = new PixHSV(maxHue,maxSat,maxVal);
+                outResult.setAt(xx, yy, PixHSV.convertToRGB(maxPixel));
+            }
+        }
+        return outResult;
+    }
+    
 }

@@ -103,17 +103,14 @@ public class Blob
         
         blobDensity = (activePixels.size() / boundingBoxArea);
         
+
+        
+        
+    }
+    
+    public void writeOut(PPMFile inImage)
+    {
         PPMFile blobOut = new PPMFile(blobWidth, blobHeight, 255, "P3");
-        //System.out.println("top left: " + topLeft.getX() +", " + topLeft.getY());
-        //PixRGB outPix = inImage.getAt(481, 111);
-//        for(int xx = 0; xx<inImage.dimensions.getX();xx++)
-//        {
-//            for(int yy = 0; yy<inImage.dimensions.getY();yy++)
-//            {
-//                PixRGB outPix = inImage.getAt(xx, yy);
-//                System.out.println(xx+", "+yy +" ["+outPix.getR()+", " + outPix.getG()+", " +outPix.getB()+"]");
-//            }
-//        }
         for(int xx = topLeft.getX(); xx < bottomRight.getX();xx++)
         {
             for(int yy = topLeft.getY(); yy < bottomRight.getY();yy++)
@@ -130,8 +127,6 @@ public class Blob
             blobOut.setAt(setPositionX, setPositionY, settingPixel);
         }
         blobOut.writePPM("blob-"+pass+"-"+blobFileOffset+".ppm");
-        
-        
     }
     
     public double getBoundingBoxArea() {
