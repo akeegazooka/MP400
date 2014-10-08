@@ -180,14 +180,6 @@ public class PPMConvolve {
                     gMedian = gSet[gSet.length/2];
                     bMedian = bSet[bSet.length/2];
                 }
-                
-//                System.out.println("---Begin Set---");
-//                for (Double rSet1 : rSet) {
-//                    System.out.println(rSet1);
-//                }
-//                System.out.println("---End Set---");
-                
-                //double outR = rSet.
                 imageOut.setAt(x, y, new PixRGB(rMedian,gMedian,bMedian));
             }
         }

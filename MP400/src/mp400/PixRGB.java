@@ -66,7 +66,53 @@ public class PixRGB extends pixAbstract {
         b = inB;
     }
     
+    public static PixHSV convertToHSV(PixRGB inRGB)
+    {
+        double rPrime = (inRGB.r/255d);
+        double gPrime = (inRGB.g/255d);
+        double bPrime = (inRGB.b/255d);
+        
+        double cMax = Math.max(Math.max(rPrime, gPrime),bPrime);
+        double cMin = Math.min(Math.min(rPrime, gPrime),bPrime);
+        double deltaC = cMax - cMin;
+        
+        double h = 0;
+        if(cMax == rPrime)
+        {
+            h = ( ((gPrime - bPrime)/deltaC) % 6 );
+        }
+        else if(cMax == gPrime)
+        {
+            h =  ( (bPrime - rPrime)/deltaC) + 2d;
+        }
+        else if(cMax == bPrime)
+        {
+            h = ((rPrime - gPrime) / deltaC) + 4d;
+        }
+        h*=60d;
+        
+        double s = 0;
+        
+        if(deltaC == 0d)
+            s = 0;
+        else
+            s = deltaC / cMax;
+        
+        double v = cMax;
+        
+        
+        PixHSV outHSV = new PixHSV(h,s,v);
+        
+        return outHSV;
+    }
     
+    public boolean equals(PixRGB inPixel)
+    {
+        return( (inPixel.getR() == this.r) &&
+            (inPixel.getG() == this.g) &&
+            (inPixel.getB() == this.b)
+          );
+    }
     
     @Override
     public String toString()
@@ -78,7 +124,7 @@ public class PixRGB extends pixAbstract {
     @Override
     public pixAbstract getPixData()
     {
-        return this;
+        return new PixRGB(this);
     }
     
     

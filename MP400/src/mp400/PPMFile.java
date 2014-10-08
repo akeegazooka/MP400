@@ -5,6 +5,7 @@
  */
 
 package mp400;
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -136,6 +137,51 @@ public class PPMFile {
                 setAt(j, i, workingPixel);
             }
         }
+    }
+    
+    public void removeColour(PixHSV minHSV ,PixHSV maxHSV, PixRGB inNewColour, boolean bg)
+    {
+        if(bg)
+        {
+            for(int y = 0; y<dimensions.getY();y++)
+            {
+                for(int x = 0;x<dimensions.getX();x++)
+                {
+                    PixHSV workingPix = PixRGB.convertToHSV(getAt(x, y) );
+
+
+                    if ( (workingPix.getHue() >= minHSV.getHue()) && (workingPix.getHue() <= maxHSV.getHue())  &&
+                        (workingPix.getSat() >= minHSV.getSat()) && (workingPix.getSat() <= maxHSV.getSat())  &&
+                        (workingPix.getVal() >= minHSV.getVal()) && (workingPix.getVal() <= maxHSV.getVal()) 
+                       )
+                    {
+                        setAt(x, y, inNewColour);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for(int y = 0; y<dimensions.getY();y++)
+            {
+                for(int x = 0;x<dimensions.getX();x++)
+                {
+                    PixHSV workingPix = PixRGB.convertToHSV(getAt(x, y) );
+                    if ( (workingPix.getHue() >= minHSV.getHue()) && (workingPix.getHue() <= maxHSV.getHue())  &&
+                        (workingPix.getSat() >= minHSV.getSat()) && (workingPix.getSat() <= maxHSV.getSat())  &&
+                        (workingPix.getVal() >= minHSV.getVal()) && (workingPix.getVal() <= maxHSV.getVal()) 
+                       )
+                    {
+                        setAt(x, y, inNewColour);
+                    }
+                    else
+                    {
+                        setAt(x, y, new PixRGB(0,0,0));
+                    }
+                }
+            }
+        }
+            
     }
     
     public void drawLines(PolarLine[] inLines)
