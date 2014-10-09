@@ -5,6 +5,8 @@
  */
 package mp400;
 
+import static sun.org.mozilla.javascript.ScriptRuntime.typeof;
+
 /**
  *
  * @author akeegazooka
@@ -12,15 +14,15 @@ package mp400;
 public class PixHSV extends pixAbstract
 {
 
-    private  double hue;
+    private double hue;
     private double sat;
     private double val;
 
     public PixHSV()
     {
-        hue = 0;
-        sat = 0;
-        val = 0;
+        hue = 0d;
+        sat = 0d;
+        val = 0d;
     }
     
     public PixHSV(PixHSV inPix)
@@ -28,6 +30,7 @@ public class PixHSV extends pixAbstract
         hue = inPix.getHue();
         sat = inPix.getSat();
         val = inPix.getVal();
+
     }
     
     public PixHSV(double inHue, double inSat, double inVal)
@@ -53,6 +56,7 @@ public class PixHSV extends pixAbstract
 
     public void setHue(double hue) {
         this.hue = hue;
+
     }
 
     public double getSat() {
@@ -61,6 +65,7 @@ public class PixHSV extends pixAbstract
 
     public void setSat(double sat) {
         this.sat = sat;
+
     }
 
     public double getVal() {
@@ -69,14 +74,69 @@ public class PixHSV extends pixAbstract
 
     public void setVal(double val) {
         this.val = val;
+ 
     }
     
     public static PixRGB convertToRGB(PixHSV inHSV)
     {
-        double r,g,b,c,x,m,rPrime = 0,gPrime = 0,bPrime = 0,outR,outG,outB = 0d;
+        double outR = 0;
+        double outG = 0;
+        double outB = 0;
+        
+        double h = inHSV.getHue();
+        double s = inHSV.getSat();
+        double v = inHSV.getVal();
+        PixRGB outPix = new PixRGB();
+        double c = v * s;
+        double hPrime = h /60;
+        
+        double x = c * (1 - Math.abs(hPrime % 2d -1));
+        if(hPrime >= 0d && hPrime < 1d)
+        {
+            outR = c;
+            outG = x;
+            outB = 0d;
+        }
+        else if (hPrime >= 1d && hPrime < 2d)
+        {
+            outR = x;
+            outG = c;
+            outB = 0d;           
+        }
+        else if (hPrime >= 2d && hPrime < 3d)
+        {
+            outR = 0d;
+            outG = c;
+            outB = x;
+        }
+        
+        else if(hPrime >= 3d && hPrime < 4d)
+        {
+            outR = 0d;
+            outG = x;
+            outB = c;
+        }
+        else if(hPrime >= 4d && hPrime < 5d)
+        {
+            outR = x;
+            outG = 0d;
+            outB = c;
+        }
+         else if(hPrime >= 5d && hPrime < 6d)
+         {
+            outR = c;
+            outG = 0d;
+            outB = x;
+         }
+        double m = v - c;
+        outR+=m;
+        outG+=m;
+        outB+=m;
+            
+/*        double r,g,b,c,x,m,rPrime = 0,gPrime = 0,bPrime = 0,outR,outG,outB = 0d;
         
         c = inHSV.getVal() * inHSV.getSat();
-        x = c * (1 - Math.abs( (inHSV.getHue()/60d)  % 2 - 1));
+        x = c * (1 - Math.abs( (inHSV.getHue()/60d)  % 2d - 1));
         m = inHSV.getVal() - c;
         
         
@@ -126,6 +186,7 @@ public class PixHSV extends pixAbstract
         outR = rPrime +m;
         outG = gPrime+m;
         outB = bPrime+m;
+        */
         
         
         return new PixRGB(outR, outG, outB);

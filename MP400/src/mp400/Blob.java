@@ -16,9 +16,12 @@ public class Blob
     
     private double boundingBoxArea;
     private double blobDensity;
+    private double aspectRatio;
+
+
     private int blobWidth;
     private int blobHeight;
-    private int blobFileOffset; 
+    private int blobFileOffset;
     
     private int numPixels;
     
@@ -40,6 +43,7 @@ public class Blob
         activePixels = new ArrayList<MP2d>();
         
         boundingBoxArea = 0;
+        aspectRatio = 0;
         blobDensity = 0;
         numPixels = 0;
         
@@ -61,13 +65,10 @@ public class Blob
         for(MP2d activePixel : activePixels)
         {
             PixHSV currPix = PixRGB.convertToHSV(inImage.getAt(activePixel.getX(), activePixel.getY()));
-            hRunningAve += currPix.getHue();
-            sRunningAve += currPix.getSat();
-            vRunningAve += currPix.getVal();
+            hRunningAve += currPix.getHue()/activePixels.size();
+            sRunningAve += currPix.getSat()/activePixels.size();
+            vRunningAve += currPix.getVal()/activePixels.size();
         }
-        hRunningAve/=activePixels.size();
-        sRunningAve/=activePixels.size();
-        vRunningAve/=activePixels.size();
         avePix.setHue(hRunningAve);
         avePix.setSat(sRunningAve);
         avePix.setVal(vRunningAve);
@@ -102,6 +103,10 @@ public class Blob
         //finding the density (fullness) of the blob in relation to its bounding box
         
         blobDensity = (activePixels.size() / boundingBoxArea);
+        
+        //finding the aspect ratio of the blob width/height
+        
+        aspectRatio = (double)blobWidth / (double)blobHeight;
         
 
         
@@ -140,6 +145,9 @@ public class Blob
     public double getDensity() {
         return blobDensity;
     }
+    public String getPass(){
+        return pass;
+    }
 
     public void setDensity(double density) {
         this.blobDensity = density;
@@ -151,6 +159,14 @@ public class Blob
 
     public void setNumPixels(int numPixels) {
         this.numPixels = numPixels;
+    }
+    
+    public double getAspectRatio() {
+        return aspectRatio;
+    }
+
+    public void setAspectRatio(double aspectRatio) {
+        this.aspectRatio = aspectRatio;
     }
     
     

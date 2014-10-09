@@ -82,6 +82,13 @@ public class Extra {
         return val;
     }
     
+    public static boolean PixelRange(PixHSV inPix, PixHSV minPix, PixHSV maxPix)
+    {
+        return ( (inPix.getHue() >= minPix.getHue()) && (inPix.getHue() <= maxPix.getHue())  &&
+                 (inPix.getSat() >= minPix.getSat()) && (inPix.getSat() <= maxPix.getSat())  &&
+                 (inPix.getVal() >= minPix.getVal()) && (inPix.getVal() <= maxPix.getVal()) );
+    }
+    
     
     
 }

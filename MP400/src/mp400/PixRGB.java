@@ -77,7 +77,11 @@ public class PixRGB extends pixAbstract {
         double deltaC = cMax - cMin;
         
         double h = 0;
-        if(cMax == rPrime)
+        if(deltaC == 0)
+        {
+            h = 0d;
+        }
+        else if(cMax == rPrime)
         {
             h = ( ( (gPrime - bPrime)/deltaC) % 6 );
             //System.out.println("calc [" + h + " delta: " +deltaC + "] " + "\ngprime "+ gPrime + " bPrime "+bPrime + "gPrime - bPrime: ["+(gPrime-bPrime)+"]" );
@@ -106,7 +110,7 @@ public class PixRGB extends pixAbstract {
         
         double v = cMax;
         
-        
+        //System.out.println("In value: " + inRGB.getR() + ", " + inRGB.getG() +", " + inRGB.getB() + "Out hue: " + h);
         PixHSV outHSV = new PixHSV(h,s,v);
         
         return outHSV;
