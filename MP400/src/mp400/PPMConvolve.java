@@ -204,7 +204,7 @@ public class PPMConvolve {
                 double maxSat = 0;
                 double maxVal = 0;
                 PixHSV maxPixel;
-                
+                boolean black = true;
                 for(int y = 0; y < nHeight;y++)
                 {
                     for(int x = 0; x < nWidth;x++)
@@ -214,17 +214,15 @@ public class PPMConvolve {
                         int fetchX = Extra.clampInt(xx + x - nWidth/2, 0, width-1);
                         int fetchY = Extra.clampInt(yy+ y - nHeight/2, 0, height-1);
                         PixHSV tempPix = PixRGB.convertToHSV(inImage.getAt(fetchX, fetchY));
+                        if(tempPix.getVal() == 0)
+                            black = true;
                         
-                        if(tempPix.getHue() > maxHue)
-                            maxHue = tempPix.getHue();
-                        if(tempPix.getSat() > maxSat )
-                            maxSat = tempPix.getSat();
-                        if(tempPix.getVal() > maxVal)
-                            maxVal = tempPix.getVal();
                     }
                 }
-                
-                maxPixel = new PixHSV(maxHue,maxSat,maxVal);
+                if(black)
+                    maxPixel = new PixHSV(0,0,0);
+                else
+                    maxPixel = new PixHSV(0,0,1);
                 outResult.setAt(xx, yy, PixHSV.convertToRGB(maxPixel));
             }
         }

@@ -16,7 +16,7 @@ import java.util.Map;
 public class ConnectedComponents
 {
 
-    public static Map<Integer, Blob> blobImage(PPMFile bwImage, PPMFile colourImage, double minBlobRatio, String pass)
+    public static Map<Integer, Blob> blobImage(PPMFile bwImage, PPMFile colourImage, double minBlobRatio, String pass, String fileName)
     {
         int width = bwImage.dimensions.getX();
         int height = bwImage.dimensions.getY();
@@ -115,7 +115,7 @@ public class ConnectedComponents
                     }
                     else
                     {
-                        newBlob = new Blob(pass, blobFileOffset);
+                        newBlob = new Blob(pass, blobFileOffset, fileName);
                         blobFileOffset++;
                         newBlob.activePixels.add( new MP2d(xx,yy) );
                         blobs.put(workingLabel, newBlob);
@@ -127,7 +127,7 @@ public class ConnectedComponents
 //         {
 //             blob.getValue().classifyBlob(colourImage);
 //         }
-         System.out.println("Finished blob processing, found " + blobs.size() +" Areas");
+         //System.out.println("Finished blob processing, found " + blobs.size() +" Areas");
         
         return blobs;
     }

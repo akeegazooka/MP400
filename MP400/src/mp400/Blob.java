@@ -26,6 +26,8 @@ public class Blob
     private int numPixels;
     
     private String pass;
+    private String fileName;
+    private String objectOfInterest;
     
     PixHSV avePix;
     MP2d topLeft;
@@ -33,7 +35,7 @@ public class Blob
     
     ArrayList<MP2d> activePixels;
     
-    public Blob(String inPass, int inOffset) 
+    public Blob(String inPass, int inOffset, String inFileName) 
     {
 
         
@@ -53,6 +55,13 @@ public class Blob
         blobFileOffset = inOffset;
         
         pass = inPass;
+        fileName = inFileName;
+        objectOfInterest = "NaN";
+        
+    }
+
+    public void setObjectOfInterest(String objectOfInterest) {
+        this.objectOfInterest = objectOfInterest;
     }
     
     public void classifyBlob(PPMFile inImage)
@@ -113,7 +122,7 @@ public class Blob
         
     }
     
-    public void writeOut(PPMFile inImage)
+    public void writeOut(PPMFile inImage,String outFolder)
     {
         PPMFile blobOut = new PPMFile(blobWidth, blobHeight, 255, "P3");
         for(int xx = topLeft.getX(); xx < bottomRight.getX();xx++)
@@ -131,7 +140,16 @@ public class Blob
             int setPositionY = active.getY() - topLeft.getY();
             blobOut.setAt(setPositionX, setPositionY, settingPixel);
         }
-        blobOut.writePPM("blob-"+pass+"-"+blobFileOffset+".ppm");
+        String outName = fileName.substring(0, fileName.lastIndexOf('.'));
+        blobOut.writePPM(outFolder+outName+"-"+objectOfInterest+".ppm");
+    }
+    public void drawBounds(PPMFile inImage)
+    {
+        inImage.bresenhamLine(topLeft.getX(), topLeft.getY(), topLeft.getX()+blobWidth , topLeft.getY(), new PixRGB(255,0,0)); //top left -> top right
+        inImage.bresenhamLine(topLeft.getX(), topLeft.getY(), topLeft.getX() , topLeft.getY()+blobHeight, new PixRGB(255,0,0)); //top left -> bottom left
+        inImage.bresenhamLine(topLeft.getX(), topLeft.getY()+blobHeight, topLeft.getX()+blobWidth , topLeft.getY()+blobHeight, new PixRGB(255,0,0)); //bottom left -> bottom right
+        inImage.bresenhamLine(topLeft.getX()+blobWidth, topLeft.getY(), topLeft.getX()+blobWidth , topLeft.getY()+blobHeight, new PixRGB(255,0,0));  //top right -> bottom right
+        
     }
     
     public double getBoundingBoxArea() {

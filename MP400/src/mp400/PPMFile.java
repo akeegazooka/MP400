@@ -207,7 +207,7 @@ public class PPMFile {
             lineEnd.setX(dimensions.getX());
             lineEnd.setY( (int) ( ( ( inLines[i].getR() - ( (dimensions.getX()-1 - centreX) * tCos) ) / tSin) + centreY ));
 
-            bresenhamLine(lineBegin.getX(), lineBegin.getY(), lineEnd.getX(), lineEnd.getY(), new PixRGB(255,0,0));
+            bresenhamLine(lineBegin.getX(), lineBegin.getY(), lineEnd.getX(), lineEnd.getY(), new PixRGB(0,0,255));
         }
     }
     
@@ -260,7 +260,10 @@ public class PPMFile {
         {
             try
             {
-                sc  = new Scanner(new FileInputStream(fileName));     
+                File f = new File(fileName);
+                FileInputStream fis = new FileInputStream(f);
+                sc  = new Scanner(fis);     
+                fileName = f.getName();
                 String s;
                 boolean metaFull = false;
                 String dataString = "";
