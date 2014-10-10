@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package mp400;
 
 /**
  *
- * @author akeegazooka
+ * @author Keegan Ott
  */
 public class PolarLine {
     
@@ -15,36 +11,67 @@ public class PolarLine {
     private double theta;
     private int votes;
     
+    /**
+     *
+     */
     public PolarLine() {
     }
 
+    /**
+     *
+     * @param inR
+     * @param inTheta
+     */
     public PolarLine(double inR, double inTheta) {
         this.r = inR;
         this.theta = inTheta;
         this.votes = 0;
-        //System.out.println("Theta in constructor : " + this.theta);
     }
 
+    /**
+     *
+     * @return
+     */
     public double getR() {
         return r;
     }
 
+    /**
+     *
+     * @param r
+     */
     public void setR(double r) {
         this.r = r;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getTheta() {
         return theta;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getVotes() {
         return votes;
     }
 
+    /**
+     *
+     * @param votes
+     */
     public void setVotes(int votes) {
         this.votes = votes;
     }
 
+    /**
+     *
+     * @param theta
+     */
     public void setTheta(double theta) {
         this.theta = theta;
     }

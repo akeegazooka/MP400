@@ -1,9 +1,4 @@
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package mp400;
 
@@ -14,26 +9,32 @@ import java.util.TreeMap;
 
 /**
  *
- * @author akeegazooka
+ * @author Keegan Ott
  */
 public class HoughTransform {
-    private double angleStep;
+    private final double angleStep;
     private double[] angles;
-    private int[][] acc;
+    private final int[][] acc;
     int mostBinVotes;
     //private MP2d [] pointMap;
     
-    
+    /**
+     *
+     * @param inImFile
+     * @param inPrecision
+     * @param startPercentage
+     */
     public HoughTransform(PPMFile inImFile, int inPrecision, double startPercentage)
     {
         //dimensionality initializers/declarations
         MP2d dimensions = inImFile.getDimensions();
-        //System.out.println("Well, i got here: " + dimensions.getX() + " " + dimensions.getY());
         int width = dimensions.getX();
         int height = dimensions.getY();
         MP2d centre = new MP2d(width/2,height/2);
         
         //angle related variables
+        /*angle step is the number of iterations through angles needed
+        to reach the level of sampling precision provided to the function*/
         angleStep = Math.PI / inPrecision;
         double[] sinCache = new double[inPrecision];
         double[] cosCache = new double[inPrecision];
@@ -44,27 +45,36 @@ public class HoughTransform {
         
         for(int i = 0;i<inPrecision;i++)
         {
+            /*calculate and then cache the sin and cos values for each step
+            through the circle, saves a lot of computation later on */
             double theta = i * angleStep;
             sinCache[i] = Math.sin(theta);
             cosCache[i] = Math.cos(theta);
         }
-        //pointMap = new MP2d[height * width];
         mostBinVotes = 0;
         for(int yy = (int) 0; yy<height;yy++)
         {
             for(int xx = 0; xx < width;xx++)
             {
-                //System.out.println("here too: " + inImFile.getAt(xx, yy).r);
+                /*if the coordinate corresponds to an edge pixel*/
                 if(inImFile.getAt(xx, yy).r == 255)
                 {
-                    //System.out.println("Got here");
+                    /*for inPrecision intervals through PI radians*/
                     for(int jj=0;jj<inPrecision;jj++)
                     {
+                        /*the value of R is offset by the center in order to
+                        make it's origin at the centre of the image, much easier
+                        for later calculations*/
                         int r = (int)  (((xx - centre.getX()) * cosCache[jj]) + ((yy - centre.getY()) * sinCache[jj]));
+                        /*the value of R is then offset by the height of the hough space
+                        so that the value of R falls between 0 and 2 * accHeight (No negatives)*/
                         r+= accHeight;
+                        /*if the given value of R falls in legal range
+                        increment the number of votes in that cell*/
                         if( (r>=0) && (r<accHeight*2) )
                             acc[jj][r]++;
-                        //System.out.println("Accessing: " + jj + ", "+ r + "max is: " + inPrecision +", " + 2*accHeight);
+                        /*if the number of votes in that cell are the greatest
+                        assign it to MaxVotes*/
                         if(acc[jj][r] >= mostBinVotes)
                             mostBinVotes = acc[jj][r];
                     }
@@ -74,6 +84,13 @@ public class HoughTransform {
         }
     }
     
+    /**
+     *A local maxima search to find the best line in a local region and to make
+     * sure that it is within a percentage of the strongest line
+     * @param neighbourhoodSize
+     * @param threshold
+     * @return
+     */
     public PolarLine[] findViableLines(int neighbourhoodSize, Double threshold)
     {
         PolarLine[] outLines;
@@ -85,8 +102,6 @@ public class HoughTransform {
         {
             tempAcc[ii] = acc[ii].clone();
         }
-        
-        //System.arraycopy(acc, 0, tempAcc, 0, acc.length);
         int neighbourhoodCentre = neighbourhoodSize /2;
         double minVotes = threshold * mostBinVotes;
         
@@ -111,14 +126,14 @@ public class HoughTransform {
                                 localMaximumVotes = tempAcc[fetchT][fetchR];
                         }
                     }
-                    //not local max
+                    //not local max, make it worthless
                     if(currBinVotes < localMaximumVotes)
                         tempAcc[t][r] = 0;
                     else
                     {
-                        bestLines.put(currBinVotes, new MP2d(t,r));
                         //insert into outlines
-                        //outLines = new PolarLine(t,r);
+                        bestLines.put(currBinVotes, new MP2d(t,r));
+                        
                     }
                 }
                 else
@@ -128,9 +143,11 @@ public class HoughTransform {
         
         outLines = new PolarLine[bestLines.size()];
         int idx = 0;
+        /*for every viable line create a polar line for it and add it to
+        the array of viable lines*/
+        
         for(Map.Entry<Integer, MP2d> viableLine : bestLines.entrySet())
         {
-            //System.out.println("Help me: "+ viableLine.getValue().toString());
             MP2d val = new MP2d(viableLine.getValue());
             outLines[idx] = getPolarLine(val.getX(), val.getY());
             idx++;
@@ -139,18 +156,31 @@ public class HoughTransform {
         return outLines;
     }
     
+    /**
+     *
+     * @param inTheta
+     * @param inR
+     * @return
+     */
     public PolarLine getPolarLine(int inTheta, int inR)
     {
         int accHeight = acc[0].length;
+        /*reverse previous offset to return it within normal ranges*/
         double r = (double) (inR - accHeight/2);
-        //System.out.println("---"+r);
         double theta = (double) (inTheta * angleStep);
-        //System.out.println("Viable polar line: " + r + ", " + theta);
+        /*offset the theta value by a tiny margin to make sure there are no
+        true 0 values otherwise the line has an infinite slope*/
         return new PolarLine(r, theta+0.001);
     }
-    //r 15%
-    //theta 15 .27
-    public PolarLine[] filterLines(PolarLine[] inLines, double thetaSimilarity, double rSimilarity )
+
+    /**
+     *Make sure no lines are too similar to eachother and keep the strongest line
+     * @param inLines
+     * @param thetaSimilarity
+     * @param rSimilarity
+     * @return
+     */
+        public PolarLine[] filterLines(PolarLine[] inLines, double thetaSimilarity, double rSimilarity )
     {
 
         PolarLine[] goodLines;
@@ -169,20 +199,15 @@ public class HoughTransform {
                     {
                         double thetaDiff = Math.abs( newLine.getTheta() - line.getTheta() );
                         double distDiff = Math.abs ( newLine.getR() - line.getR() );
-
-                        System.out.println("R1: " + newLine.getR() + "\nR2: " + line.getR() + "\nR Threshold: "+rSimilarity + "\nR diff: " + distDiff + "\nTheta threshold: " + thetaSimilarity + "\nTheta Diff: " + thetaDiff );
-
+                        
                         if( (thetaDiff <= thetaSimilarity) && (distDiff <= rSimilarity) )
                         {
-                            System.out.println("TOO SIMILAR");
                             isSimilar = true;
                         }
                     }
                     if( (!isSimilar) && (lineArray.size() < 3))
                         lineArray.add(line);
                 }
-                
-                //System.out.println(line.getR());
             }        
         }
         
@@ -195,6 +220,10 @@ public class HoughTransform {
         
     }
     
+    /**
+     *Create an image of the hough space and write it to disk.
+     * @return
+     */
     public PPMFile manifestHoughSpace()
     {
         int thetaSteps = acc.length;
@@ -205,11 +234,8 @@ public class HoughTransform {
         {
             for(int j = 0;j<thetaSteps;j++)
             {
-               // System.out.println(acc[j][i]);
-                //System.out.println( (double) (acc[j][i]) /mostBinVotes * 255) ;
-                Double v = (double) acc[j][i] / mostBinVotes*255.d; //maybe broken
+                Double v = (double) acc[j][i] / mostBinVotes*255.d;
                 PixRGB pixel = new PixRGB(v,v,v);
-                //System.out.println(pixel.r +", "+pixel.g+", "+pixel.b);
                 outHoughSpaceImage.setAt(j, i, pixel);
             }
         }

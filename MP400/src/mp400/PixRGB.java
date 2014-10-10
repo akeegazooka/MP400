@@ -1,20 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 
 package mp400;
 
 /**
  *
- * @author akeegazooka
+ * @author Keegan Ott
  */
 public class PixRGB extends pixAbstract {
+
     public double r;
     public double g;
     public double b;
     
+    /**
+     *
+     * @param inR
+     * @param inG
+     * @param inB
+     */
     public PixRGB(double inR, double inG, double inB)
     {
         r = inR;
@@ -22,6 +25,9 @@ public class PixRGB extends pixAbstract {
         b = inB;
     }
     
+    /**
+     *
+     */
     public PixRGB()
     {
         r = 0d;
@@ -29,6 +35,10 @@ public class PixRGB extends pixAbstract {
         b = 0d;
     }
     
+    /**
+     *
+     * @param inRGB
+     */
     public PixRGB(PixRGB inRGB)
     {
         r = inRGB.r;
@@ -36,36 +46,66 @@ public class PixRGB extends pixAbstract {
         b = inRGB.b;
     }
     
+    /**
+     *
+     * @return
+     */
     public double getR()
     {
         return r;
     }
     
+    /**
+     *
+     * @return
+     */
     public double getG()
     {
         return g;
     }
     
+    /**
+     *
+     * @return
+     */
     public double getB()
     {
         return b;
     }
     
+    /**
+     *
+     * @param inR
+     */
     public void setR(double inR)
     {
         r = inR;
     }
     
+    /**
+     *
+     * @param inG
+     */
     public void setG(double inG)
     {
         g = inG;
     }
     
+    /**
+     *
+     * @param inB
+     */
     public void setB(double inB)
     {
         b = inB;
     }
     
+    /**
+     *A function to convert from an RGB Pixel to a HSV one
+     * referenced ffrom the internet
+     * @param inRGB
+     * @return
+     */
     public static PixHSV convertToHSV(PixRGB inRGB)
     {
         double rPrime = (inRGB.r/255d);
@@ -116,6 +156,11 @@ public class PixRGB extends pixAbstract {
         return outHSV;
     }
     
+    /**
+     *
+     * @param inPixel
+     * @return
+     */
     public boolean equals(PixRGB inPixel)
     {
         return( (inPixel.getR() == this.r) &&
@@ -124,6 +169,10 @@ public class PixRGB extends pixAbstract {
           );
     }
     
+    /**
+     *
+     * @return
+     */
     @Override
     public String toString()
     {
@@ -131,6 +180,10 @@ public class PixRGB extends pixAbstract {
           
     }
     
+    /**
+     *
+     * @return
+     */
     @Override
     public pixAbstract getPixData()
     {

@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package mp400;
 
-import static sun.org.mozilla.javascript.ScriptRuntime.typeof;
 
 /**
  *
- * @author akeegazooka
+ * @author Keegan Ott
  */
 public class PixHSV extends pixAbstract
 {
@@ -18,6 +13,9 @@ public class PixHSV extends pixAbstract
     private double sat;
     private double val;
 
+    /**
+     *
+     */
     public PixHSV()
     {
         hue = 0d;
@@ -25,6 +23,10 @@ public class PixHSV extends pixAbstract
         val = 0d;
     }
     
+    /**
+     *
+     * @param inPix
+     */
     public PixHSV(PixHSV inPix)
     {
         hue = inPix.getHue();
@@ -33,6 +35,12 @@ public class PixHSV extends pixAbstract
 
     }
     
+    /**
+     *
+     * @param inHue
+     * @param inSat
+     * @param inVal
+     */
     public PixHSV(double inHue, double inSat, double inVal)
     {
         hue = inHue;
@@ -40,43 +48,81 @@ public class PixHSV extends pixAbstract
         val = inVal;
     }
     
+    /**
+     *
+     * @return
+     */
     @Override
     public String toString() {
         return (hue + ", " + sat + ", " + val );
     }
 
-    
+    /**
+     *
+     * @return
+     */
+    @Override
     public pixAbstract getPixData() {
         return new PixHSV(this);
     }
 
+    /**
+     *
+     * @return
+     */
     public double getHue() {
         return hue;
     }
 
+    /**
+     *
+     * @param hue
+     */
     public void setHue(double hue) {
         this.hue = hue;
 
     }
 
+    /**
+     *
+     * @return
+     */
     public double getSat() {
         return sat;
     }
 
+    /**
+     *
+     * @param sat
+     */
     public void setSat(double sat) {
         this.sat = sat;
 
     }
 
+    /**
+     *
+     * @return
+     */
     public double getVal() {
         return val;
     }
 
+    /**
+     *
+     * @param val
+     */
     public void setVal(double val) {
         this.val = val;
  
     }
     
+    /**
+     *A function that converts a HSV pixel to an RGB one.
+     * implementation is referenced from the internet
+     * @param inHSV
+     * @return
+     */
     public static PixRGB convertToRGB(PixHSV inHSV)
     {
         double outR = 0;
@@ -132,66 +178,15 @@ public class PixHSV extends pixAbstract
         outR+=m;
         outG+=m;
         outB+=m;
-            
-/*        double r,g,b,c,x,m,rPrime = 0,gPrime = 0,bPrime = 0,outR,outG,outB = 0d;
-        
-        c = inHSV.getVal() * inHSV.getSat();
-        x = c * (1 - Math.abs( (inHSV.getHue()/60d)  % 2d - 1));
-        m = inHSV.getVal() - c;
-        
-        
-        if( (inHSV.getHue() <= 0) && (inHSV.getHue() < 60) )
-        {
-            //c,x,0
-            rPrime = c;
-            gPrime = x;
-            bPrime = 0d;
-        }
-        else if( (inHSV.getHue() <= 60) && (inHSV.getHue() < 120) )
-        {
-            //x, c, 0
-            rPrime = x;
-            gPrime = c;
-            bPrime = 0d;
-        }
-        else if( (inHSV.getHue() <= 120) && (inHSV.getHue() < 180) )
-        {
-            //0,c,x
-            rPrime = 0d;
-            gPrime = c;
-            bPrime = x;
-        }
-        else if( (inHSV.getHue() <= 180) && (inHSV.getHue() < 240) )
-        {
-            //0,x,c
-            rPrime = 0d;
-            gPrime = c;
-            bPrime = x;
-        }
-        else if( (inHSV.getHue() <= 240) && (inHSV.getHue() < 300) )
-        {
-            //x,0,c
-            rPrime = x;
-            gPrime = 0d;
-            bPrime = c;
-        }
-        else if( (inHSV.getHue() <= 300) && (inHSV.getHue() < 360) )
-        {
-            //c,0,x
-            rPrime = c;
-            gPrime = 0d;
-            bPrime = x;
-        }
-        
-        outR = rPrime +m;
-        outG = gPrime+m;
-        outB = bPrime+m;
-        */
-        
         
         return new PixRGB(outR, outG, outB);
     }
     
+    /**
+     *equality operation for a HSV Pixel
+     * @param inPixel
+     * @return
+     */
     public boolean equals(PixHSV inPixel)
     {
         return(

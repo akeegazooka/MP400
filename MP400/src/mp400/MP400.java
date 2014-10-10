@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 
 package mp400;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+
 import static java.lang.Math.pow;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +12,7 @@ import java.util.Map;
 
 /**
  *
- * @author akeegazooka
+ * @author Keegan Ott
  */
 public class MP400 {
 
@@ -26,6 +22,7 @@ public class MP400 {
      */
     public static void main(String[] args) throws FileNotFoundException
     {
+        //Java 1.6 does not allow switching on strings so this is a workaround.
         int task = 0;
         if(args[0].equals("3.1"))
             task = 1;
@@ -34,26 +31,32 @@ public class MP400 {
         else if(args[0].equals("3.3"))
             throw new UnsupportedOperationException("Not implemented :(");
         
+        //set working directories to ones supplied by the user
         String inDir = args[1];
         String outDir = args[2];
         
         File outDirectory = new File(outDir);
+        //create them if they dont exist
         outDirectory.mkdirs();
         File[] inputFiles = new File(inDir).listFiles();
         if(inputFiles == null)
         {
             throw new FileNotFoundException("No files found");
         }
+        //for every single file in the inputted directory.
         for(File file : inputFiles)
         {
             String name = file.getName();
             String path = file.getAbsolutePath();
+            //if the file is ppm format 
             if(file.isFile() && name.substring(name.length()-3).toLowerCase().equals("ppm"))
             {
+                //supply file to the given task
                 if(task == 1)
                 {
                     try
                     {
+                        
                         taskOne(new PPMFile(path), outDir);    
                     }
                     catch (Exception e) 
@@ -77,22 +80,16 @@ public class MP400 {
             }
         }
     }
-       
+
+    /**
+     *The over-arching controller for task one's operations.
+     * @param inFile The file that this loop of task one will operate on
+     * @param outFolder The folder that all the output is to be written to
+     */
+    
     public static void taskOne(PPMFile inFile, String outFolder)
     {
             outFolder = outFolder.concat("/");
-            //PPMConvolve matrix = new PPMConvolve();
-            //Double[][] genGauss = PPMConvolve.generateGaussKernel(2.5d);
-
-            //mexican hat creation.
-            //PixMask newMask = new PixMask(Extra.mexicanHat);
-            //PixMask mexican = matrix.normalizeMask(newMask);
-
-            //gaussian creation
-            //PixMask newMask1 = new PixMask(genGauss);
-            //PixMask gaussian = matrix.normalizeMask(newMask1);
-
-            //sobel creation.
 
             PixMask kSobelX = PPMConvolve.normalizeMask(new PixMask(Extra.sobelX));
             PixMask kSobelY = PPMConvolve.normalizeMask(new PixMask(Extra.sobelY));
@@ -100,102 +97,162 @@ public class MP400 {
 
             PPMFile newPpmData;
             PPMFile houghSpace;
-
+            
+            /**
+             *The pipeline that task one follows begins with a median filter
+             * to attempt to remove noise.
+             */
             newPpmData = PPMConvolve.median(inFile, 5);
-            //newPpmData = PPMConvolve.median(ppmData, 5);
+            /**
+             * The a sobel edge detection operation is completed (adding
+             * both halves together in a single line).
+             */
             newPpmData = MPUtility.imageAdd(PPMConvolve.convolve(kSobelX, newPpmData), PPMConvolve.convolve(kSobelY, newPpmData));
+            
+            /**
+             * the edge image is then thresholded around the average RGB value
+             * of 5, nothing special about this number it was found through trial
+             * and error.
+             */
             newPpmData.threshold(5d);
-
+            /**
+             * another Median filter is applied to further remove noise
+             * (this time it is performed on the edge image).
+             */
             newPpmData = PPMConvolve.median(newPpmData, 5);
+            /**
+             * the previous operations were all in preparation for the Hough Transform
+             * stage, the function is provided with a pre-processed image file
+             * along with the number of angle steps to be performed for the hough
+             * transform.
+             * 
+             * the last parameter is the percentage of where to begin analysing
+             * within the image, in this case .5 means it starts halfway down.
+             */
             HoughTransform houghTransform = new HoughTransform(newPpmData, 180, 0.5);
             PolarLine[] lines = houghTransform.findViableLines(20, .2d);
             PolarLine[] goodLines = houghTransform.filterLines(lines, .3, .4 * Math.sqrt(pow(newPpmData.dimensions.getX(),2) + Math.pow(newPpmData.dimensions.getY(), 2)));
-            //newPpmData.drawLines(lines);
+            /**
+             * Write the lines that were found through the hough to file, this concludes the
+             * line finding section.
+             */
             inFile.drawLines(goodLines);
             
-            //blob to find signs
+            /**
+             * In order to detect signs within a road scene Connected component
+             * labelling is used to detect regions similar to signs.
+             */
             Map<Integer,Blob> signs = new HashMap<Integer,Blob>();
+            
+            /**
+             * because of the circular nature of the Hue part of HSV
+             * colour two ranges are needed for red, hence two files will be used.
+             * 
+             */
             PPMFile sign_red0 = new PPMFile(inFile);
             PPMFile sign_red1 = new PPMFile(inFile);
             PPMFile sign_red = new PPMFile(inFile);
             
+            /**
+             * isolate the end of the hue spectrum belonging to red.
+             */
             sign_red0.removeColour(new PixHSV(345d, 0.5d, .1d),new PixHSV(365d, 1d, 1d), new PixRGB(255,255,255), false);
-            //sign_red0.writePPM(outFolder+"0Ok"+inFile.getFileName());
+            /**
+             * isolate the beginning of the hue spectrum belonging to red.
+             */
             sign_red1.removeColour(new PixHSV(-1d, 0.5d, .1d),new PixHSV(15d, 1d, 1d), new PixRGB(255,255,255), false);
-            //sign_red1.writePPM(outFolder+"1Ok"+inFile.getFileName());
+            /**
+             * because of the binary nature of the colour isolated images two images
+             * can be easily added together similar to an OR operation.
+            */
             sign_red = MPUtility.imageAdd(sign_red0, sign_red1);
-            //PPMConvolve.median(sign_red, 3);
-            //sign_red.writePPM(outFolder+"Ok"+inFile.getFileName());
-            
-            
+            /**
+             * add all the found blobs to a preliminary list of un-analysed blobs.
+             */
             signs.putAll( ConnectedComponents.blobImage(sign_red,inFile, 0.0001, "sign_red", inFile.getFileName()));
             
             for(Map.Entry<Integer,Blob> blob: signs.entrySet())
             {
+                /**
+                 * this stage loops through all the found blobs and tells
+                 * each one to produce information about itself such as 
+                 * density, size and aspect ratio.
+                 */
                 blob.getValue().classifyBlob(inFile);
-                //blob.getValue().writeOut(inFile, outFolder);
             }
-            Blob bestSign = FindStuff.findSign(signs);
+            /**
+             * after each blob has produced its attributes it can be passed
+             * to a function that fits it to a specific classification
+             * for a sign.
+             */
+            Blob bestSign = FindBlob.findSign(signs);
             if(bestSign != null)
             {
                 bestSign.writeOut(inFile, outFolder);
                 bestSign.drawBounds(inFile);
             }
-            //lines_signs.writePPM(outFolder+inFile.getFileName()+"uhh.ppm");
-            //newPpmData= matrix.convolve(mexican, ppmData);
        
-
-            if(inFile!=null)
-            {
+            
+  /*          //if(inFile!=null)
+            //{
                  //newFile.writePPM("original.ppm");
                  //newPpmData.writePPM(outFolder+"out.ppm");
                  inFile.writePPM(outFolder+inFile.getFileName()+ "-out.ppm");
                  houghTransform.manifestHoughSpace().writePPM(outFolder+"HOUGH.ppm");
 
-            }
-       
+            //}
+       */
     }
-       
+            
+    /**
+     *Task Two performs Blobbing and classification on 8 images
+     * that are found within a scene (any combination at any time)
+     * To ease the process of classification blobs are detected on a per
+     * colour basis on an image that has had its background removed (black)
+     * @param inFile The current file to be worked on.
+     * @param outFolder The output directory.
+     */
     public static void taskTwo(PPMFile inFile, String outFolder)
     {
+        /**
+         * in order to output correctly to a folder a slash
+         * is added to the folder path.
+         */
         outFolder = outFolder.concat("/");
         PPMFile task2PPM = new PPMFile(inFile);
         PPMFile colourImage = new PPMFile(inFile);
-        task2PPM.writePPM(outFolder+"OriginalTask2.ppm");
+        
+        /**
+         * Before anything else is performed a preprocessing stage of
+         * a 5 x 5 median filter is performed on the given file.
+         */
         task2PPM = PPMConvolve.median(task2PPM, 5);
 
         Map<Integer,Blob> blobs = new HashMap<Integer,Blob>();
 
         //background removal run
         task2PPM.removeColour(new PixHSV(10d, 0.05d, 0.2d),new PixHSV(52d, 0.25d, 0.95d), new PixRGB(0,0,0), true);
-        //task2PPM.writePPM(outFolder+"No_BG.ppm");
 
         //Yellow/Orange range run
         PPMFile orange_yellow = new PPMFile(task2PPM);
         orange_yellow.removeColour(new PixHSV(21d, .8d, .2d),new PixHSV(52d, 1d, .92d), new PixRGB(255,255,255), false);
         blobs.putAll( ConnectedComponents.blobImage(orange_yellow,colourImage, 0.001, "orange_yellow", inFile.getFileName()));
-       // orange_yellow.writePPM(outFolder+"Yellow_Orange.ppm");
 
         //darker blue run
         PPMFile dark_blue = new PPMFile(task2PPM);
         dark_blue.removeColour(new PixHSV(180d, .85d, .15d),new PixHSV(235d, 1d, .58d), new PixRGB(255,255,255), false);
         blobs.putAll( ConnectedComponents.blobImage(dark_blue,colourImage, 0.001, "dark_blue", inFile.getFileName()));
-        //dark_blue.writePPM(outFolder+"Blue.ppm");
 
         //lighter blue run
         PPMFile light_blue = new PPMFile(task2PPM);
         light_blue.removeColour(new PixHSV(170d, 0d, 0d),new PixHSV(250d, .5d, .5d), new PixRGB(255,255,255), false);
         blobs.putAll( ConnectedComponents.blobImage(light_blue,colourImage, 0.002, "light_blue", inFile.getFileName()));
-        //light_blue.writePPM(outFolder+"Light_Blue.ppm");
 
         //purple run
         PPMFile purple = new PPMFile(task2PPM);
         purple.removeColour(new PixHSV(310, .42d, .05d),new PixHSV(355d, 1, .57d), new PixRGB(255,255,255), false);
         blobs.putAll( ConnectedComponents.blobImage(purple,colourImage, 0.001,"purple", inFile.getFileName()));
-        //purple.writePPM(outFolder+"Purple.ppm");
-
-
-
+        
         //amazon_brown
         PPMFile brown = new PPMFile(task2PPM);
         brown.removeColour(new PixHSV(22, .6d, .07d),new PixHSV(47d, 1, .33), new PixRGB(255,255,255), false);
@@ -203,7 +260,6 @@ public class MP400 {
         //brown.writePPM(outFolder+"Amazon_Brown.ppm");
 
         //totoro brown
-
         PPMFile totoro_brown = new PPMFile(task2PPM);
         //new PixHSV(28, .28d, .15d),new PixHSV(45d, .55, .55d)
         totoro_brown.removeColour(new PixHSV(24, .30d, 0d),new PixHSV(45d, .7, .6d), new PixRGB(255,255,255), false);
@@ -217,7 +273,12 @@ public class MP400 {
         //wheel_beige.writePPM(outFolder+"Wheel_Beige.ppm");
 
         //Mexican hat attempt
-        //PPMConvolve.maxFilter(task2PPM, 5);
+        /**
+         * the mexican hat unlike the other objects is quite a complex object 
+         * which means i had to do an operation on several colour ranges
+         * stage one isolates blue, stage two isolates red and stage three
+         * isolates green, they are then added together to form a larger blob.
+         */
         PPMFile mexican_blue = new PPMFile(task2PPM);
         PPMFile mexican_red = new PPMFile(task2PPM);
         PPMFile mexican_green = new PPMFile(task2PPM);
@@ -231,53 +292,56 @@ public class MP400 {
         mexican_hat = MPUtility.imageAdd(mexican_hat, mexican_green);
 
         blobs.putAll( ConnectedComponents.blobImage(mexican_hat,colourImage, 0.001, "mexican_hat", inFile.getFileName()));
-        //mexican_hat.writePPM(outFolder+"Mexican_Hat.ppm");
 
-
-
-        //System.out.println("HELLO WORLD:::::::: "+outFolder);
+        /**every different colour range of object goes into the same
+         * blob pool but are differentiated by a colour pass attribute
+         * saying what run produced it.
+         */
         for(Map.Entry<Integer,Blob> blob: blobs.entrySet())
         {
             blob.getValue().classifyBlob(colourImage);
-            //blob.getValue().writeOut(inFile, outFolder);
         }
 
         //1. find the purple dome
-        Blob bestPurpleBlob = FindStuff.findPurpleDisk(blobs);
+        Blob bestPurpleBlob = FindBlob.findPurpleDisk(blobs);
         if(bestPurpleBlob != null)
             bestPurpleBlob.writeOut(inFile, outFolder);
 
         //2. find mr. amazon.
-        Blob bestAmazon = FindStuff.findAmazon(blobs);
+        Blob bestAmazon = FindBlob.findAmazon(blobs);
         if(bestAmazon != null)
             bestAmazon.writeOut(inFile, outFolder);
 
         //3. find blue toto
-        Blob bestBlueToto = FindStuff.findBlueTotoro(blobs);
+        Blob bestBlueToto = FindBlob.findBlueTotoro(blobs);
         if(bestBlueToto != null)
             bestBlueToto.writeOut(inFile, outFolder);
 
         //4. find grey toto
-        Blob bestGreyToto = FindStuff.findGreyToto(blobs);
+        Blob bestGreyToto = FindBlob.findGreyToto(blobs);
         if(bestGreyToto != null)
             bestGreyToto.writeOut(inFile, outFolder);
 
         //5. find keepon
-        Blob bestKeepon = FindStuff.findKeepon(blobs);
+        Blob bestKeepon = FindBlob.findKeepon(blobs);
         if(bestKeepon != null)
             bestKeepon.writeOut(inFile, outFolder);
 
         //6. find duck
 
-        Blob bestDuck = FindStuff.findDuck(blobs);
+        Blob bestDuck = FindBlob.findDuck(blobs);
         if(bestDuck != null)
             bestDuck.writeOut(inFile, outFolder);
-
-        Blob bestWheel = FindStuff.findWheel(blobs);
+        
+        //7. find the wheel
+        
+        Blob bestWheel = FindBlob.findWheel(blobs);
         if(bestWheel != null)
             bestWheel.writeOut(inFile, outFolder);
-
-        Blob bestHat = FindStuff.findMexicanHat(blobs);
+        
+        //8. find the mexican hat
+        
+        Blob bestHat = FindBlob.findMexicanHat(blobs);
         if(bestHat != null)
             bestHat.writeOut(inFile, outFolder);
     }

@@ -1,25 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 
 package mp400;
-import java.awt.Color;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
  *
- * @author akeegazooka
+ * @author Keegan Ott
  */
 public class PPMFile {
     PixRGB[][] imageData;
@@ -28,12 +19,23 @@ public class PPMFile {
     Integer maxValue;
     String fileName;
     
+    /**
+     *Alternate constructor that takes in a filename and then 
+     * calls a loading function with that filename to populate it's 
+     * pixel data.
+     * @param inFileName the name of the file to be populated from
+     * @throws IOException
+     */
     public PPMFile(String inFileName) throws IOException
     {
         setFileName(inFileName);
         loadPPM();
     }
     
+    /**
+     *Copy Constructor
+     * @param inFile
+     */
     public PPMFile(PPMFile inFile)
     {
         imageData = inFile.getImageData();
@@ -43,6 +45,14 @@ public class PPMFile {
         fileName = inFile.getFileName();
     }
     
+    /**
+     *Alternate constructor #2 creates an empty image the size of the
+     * input Basic file information is set and containers are initialized.
+     * @param inWidth
+     * @param inHeight
+     * @param max Maximum pixel value
+     * @param inFormat PPM specific metadata eg "P3"
+     */
     public PPMFile(int inWidth, int inHeight, int max, String inFormat)
     {
         imageData = new PixRGB[inWidth][inHeight];
@@ -52,6 +62,10 @@ public class PPMFile {
         
     }
     
+    /**
+     *
+     * @return Images inner pixel array
+     */
     public PixRGB[][] getImageData()
     {
         PixRGB[][] outData = new PixRGB[dimensions.getX()][dimensions.getY()];
@@ -66,6 +80,10 @@ public class PPMFile {
         return outData;
     }
     
+    /**
+     *
+     * @return
+     */
     public String getFormat()
     {
         String outFormat = this.format;
@@ -73,6 +91,10 @@ public class PPMFile {
         return outFormat;
     }
     
+    /**
+     *
+     * @return
+     */
     public MP2d getDimensions()
     {
         MP2d outDimensions = new MP2d(dimensions);
@@ -80,11 +102,19 @@ public class PPMFile {
         return outDimensions;
     }
     
+    /**
+     *
+     * @return
+     */
     public int getMaxValue()
     {
         return maxValue;
     }
     
+    /**
+     *
+     * @return
+     */
     public String getFileName()
     {
         return fileName;
@@ -95,6 +125,12 @@ public class PPMFile {
         fileName = inFileName;
     }
     
+    /**
+     *Fetch an RGB pixel from the image
+     * @param inX
+     * @param inY
+     * @return copy of image pixel
+     */
     public PixRGB getAt(int inX, int inY)
     {
         PixRGB outPixel = new PixRGB();
@@ -105,6 +141,12 @@ public class PPMFile {
         return outPixel;
     }
     
+    /**
+     *
+     * @param xCoord
+     * @param yCoord
+     * @param inRGB
+     */
     public void setAt(int xCoord, int yCoord, PixRGB inRGB)
     {
         PixRGB newPixel = new PixRGB(inRGB);
@@ -112,6 +154,11 @@ public class PPMFile {
             imageData[xCoord][yCoord] = newPixel;   
     }
     
+    /**
+     *A function that thresholds an image to b/w around a pivot average
+     * RGB value
+     * @param thresh the average component of a pixel to threshold around
+     */
     public void threshold(double thresh)
     {
         for(int i = 0; i < dimensions.getY();i++)
@@ -139,6 +186,16 @@ public class PPMFile {
         }
     }
     
+    /**
+     *A function that isolates a colour range and changes it to a single colour
+     * that is provided. if bg (background) is true it only changes the colour range 
+     * given to a new colour, if bg is false then the rest of the image that is not the 
+     * given range is turned to black.
+     * @param minHSV
+     * @param maxHSV
+     * @param inNewColour
+     * @param bg
+     */
     public void removeColour(PixHSV minHSV ,PixHSV maxHSV, PixRGB inNewColour, boolean bg)
     {
         if(bg)
@@ -184,6 +241,10 @@ public class PPMFile {
             
     }
     
+    /**
+     *
+     * @param inLines Polar lines in the form of r, theta
+     */
     public void drawLines(PolarLine[] inLines)
     {
         int centreX = dimensions.getX()/2;
@@ -197,21 +258,30 @@ public class PPMFile {
             double tCos = Math.cos(inLines[i].getTheta());
             double tSin = Math.sin(inLines[i].getTheta());
             
-            //System.out.println("cos / sin val "+tCos +", " + tSin);
-            
             
             //find x,y at left edge of image
             lineBegin.setX(0);
             lineBegin.setY( (int) ( (  ( inLines[i].getR() -(-centreX * tCos) ) / tSin) + centreY ) );
             
+            //find x,y at right of image
             lineEnd.setX(dimensions.getX());
             lineEnd.setY( (int) ( ( ( inLines[i].getR() - ( (dimensions.getX()-1 - centreX) * tCos) ) / tSin) + centreY ));
-
+            
+            //feed the line beginning at line end to a bresenham line drawing algorithm
             bresenhamLine(lineBegin.getX(), lineBegin.getY(), lineEnd.getX(), lineEnd.getY(), new PixRGB(0,0,255));
         }
     }
     
-    
+    /**
+     *A function that utilizes Bresenham's line drawing algorithm that allows
+     * reasonable single pixel width lines to be drawn across a 2d image
+     * given a beginning and an end coordinate.
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param colour
+     */
     public void bresenhamLine(int x1,int y1, int x2, int y2, PixRGB colour)
     {
         if((x1==x2) && (y1==y2))
@@ -246,13 +316,16 @@ public class PPMFile {
                     diff+=dx;
                     y1+=shiftY;
                 }
-                //System.out.println("Setting at " + x1+", " + y1);
                 setAt(x1, y1, colour);
             }
             
         }
     }
     
+    /**
+     * an internal function utilized and accessible only via the alternate
+     * constructor that is provided a filename to populate its data from.
+     */
     private void loadPPM()
     {
         Scanner sc = null;
@@ -265,6 +338,11 @@ public class PPMFile {
                 sc  = new Scanner(fis);     
                 fileName = f.getName();
                 String s;
+                /**
+                 * metaFull in this context refers to whether or not all
+                 * the required metadata to classify a PPM image file has been
+                 * obtained.
+                 */
                 boolean metaFull = false;
                 String dataString = "";
                 String[] dataElements = null;
@@ -272,9 +350,13 @@ public class PPMFile {
                 while(sc.hasNextLine() && (!metaFull) )
                 {
                     s = sc.nextLine();
-                    lineResult = s.split("#");
+                    /*split around the comment identifier, this allows for
+                    comments to occur at the end of a line of pixel data or
+                    at the beginning of a file.*/
+                    lineResult = s.split("#"); 
                     if(! lineResult[0].equals("") )
                     {
+                        //append a new peice of metadata 
                         dataString = dataString.concat(" " + lineResult[0]);
                         dataElements = dataString.split(" ");
                         if(dataElements.length == 5)
@@ -286,10 +368,6 @@ public class PPMFile {
 
                 if(dataElements != null)
                 {
-                    for(int jj = 0;jj<5;jj++)
-                    {
-                        System.out.println(dataElements[jj]);
-                    }
                     format = dataElements[1];
                     dimensions = new MP2d(Integer.parseInt(dataElements[2]), Integer.parseInt(dataElements[3]) );
                     imageData = new PixRGB[dimensions.getX()][dimensions.getY()];
@@ -299,17 +377,13 @@ public class PPMFile {
                     try 
                     {
                        for(int y = 0;y<dimensions.getY();y++)
-                       //for(int x = 0;x < dimensions.getX();x++)
                        {
-                           //imageData.add(new ArrayList<PixRGB>());
                            for(int x = 0;x < dimensions.getX();x++)
-                           //for(int y = 0;y<dimensions.getY();y++)
                            {
                                tempRGBData = new PixRGB();
                                tempRGBData.setR(sc.nextInt());
                                tempRGBData.setG(sc.nextInt());
                                tempRGBData.setB(sc.nextInt());
-                               //imageData.get(x).add(tempRGBData);
                                imageData[x][y] = tempRGBData;
                            }
                        }
@@ -336,6 +410,10 @@ public class PPMFile {
         }
     }
     
+    /**
+     *The function that output the PPM image data to a file.
+     * @param outFile the file to write the image data to
+     */
     public void writePPM(String outFile)
     {
         PrintWriter pw = null;
@@ -352,15 +430,10 @@ public class PPMFile {
             if(pw != null)
             {
                 pw.print("P3\n"+this.dimensions.getX() + " " + this.dimensions.getY() + "\n"+ maxValue+"\n");
-                //for(int xx = 0; xx < this.dimensions.getX();xx++)
                 for(int yy= 0; yy < this.dimensions.getY();yy++)
                 {
-                    //for(int yy= 0; yy < this.dimensions.getY();yy++)
                     for(int xx = 0; xx < this.dimensions.getX();xx++)
                     {
-//                         if( (float)yy%5.0 == 0 )
-//                            pw.print("\n");
-                        //pw.print(this.imageData.get(xx).get(yy).toString());
                          pw.print(this.getAt(xx, yy));
                          pw.print("\n");
                     }

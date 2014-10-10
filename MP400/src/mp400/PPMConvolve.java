@@ -1,30 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 
 package mp400;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 /**
  *
- * @author akeegazooka
+ * @author Keegan Ott
  */
 public class PPMConvolve {
     PixMask mask;
     PixMask normalMask;
     
+    /**
+     *
+     * @param inMask A 2d array of any size to be applied to the supplied image.
+     * @param inImage the image that will be convolved upon with the supplied mask
+     * @return imageOut is a copy of the supplied image modified by the convolution mask
+     */
     public static PPMFile convolve(PixMask inMask, PPMFile inImage)
     {
-        //PPMFile imageOut = new PPMFile(inImage);
-        System.out.println("Dimensions " + inImage.dimensions.getX() + " " + inImage.dimensions.getY());
+        /**
+         * create copy of given image
+        */
         PPMFile imageOut = new PPMFile(inImage.dimensions.getX(), inImage.dimensions.getY(), 255, "P3");
         
         int width = imageOut.dimensions.getX();
@@ -32,7 +28,11 @@ public class PPMConvolve {
         
         int kWidth = inMask.kernel.length;
         int kHeight = inMask.kernel[0].length;
-        
+        /**
+         * for every pixel in the image loop through the surrounding
+         * neighbourhood of pixels calculating the current pixel's new
+         * value based around them.
+         */
         for(int iY = 0;iY<height;iY++)
         {
             for(int iX = 0;iX<width;iX++)
@@ -58,8 +58,12 @@ public class PPMConvolve {
         return imageOut;
     }
   
-    
-
+    /**
+     *A normalized mask is useful because it allows the image pixels that are
+     * being operated on to stay within the colour range (in this case 0..255
+     * @param inMask a convolution mask to be normalized
+     * @return A normalized mask  is useful because it allows the image pixels
+     */
     public static PixMask normalizeMask(PixMask inMask)
     {
         PixMask normMask = new PixMask(inMask.kernel);
@@ -82,6 +86,12 @@ public class PPMConvolve {
         
         return normMask;
     }
+    
+    /**
+     * changes any negative components to their positive counterparts
+     * @param inPix a possibly negative pixel
+     * @return a positive pixel
+     */
     private static PixRGB pixAbs(PixRGB inPix)
     {
         inPix.setR(Math.abs(inPix.getR()));
@@ -91,6 +101,12 @@ public class PPMConvolve {
         return inPix;
     }
     
+    /**
+     *a function that can generate multi-sized gauss kernels useful for
+     * multiple image operations
+     * @param sigma an exponent useful for defining the size and intensity of a gauss kernel
+     * @return a variably sized gauss kernel
+     */
     public static Double[][] generateGaussKernel(Double sigma)
     {
         Integer radius = (int)Math.round(sigma)*3;
@@ -116,6 +132,16 @@ public class PPMConvolve {
         return kernel;
     }
     
+    /**
+     *The median filter collects a neighbourhood of pixels and sorts each
+     * component of those pixels, then find the middle value and uses that
+     * as the value for the pixel being operated on, useful for removing speckle
+     * noise.
+     * @param inFile an image files to be used as a baseline for the median filter
+     * @param size the dimensions of the neighbourhood surrounding each pixel
+     * to utilize
+     * @return a modified copy of the provided image file
+     */
     public static PPMFile median(PPMFile inFile, int size)
     {
         int mHeight = size;
@@ -133,8 +159,6 @@ public class PPMConvolve {
         Double[] rSet;
         Double[] gSet;
         Double[] bSet;
-        
-        //List<Integer> neighbourhood = new ArrayList<>();
         
         PPMFile imageOut = new PPMFile(width,height,255,"P3");
         
@@ -187,6 +211,13 @@ public class PPMConvolve {
         
     }
     
+    /**
+     *
+     * @param inImage baseline image for operations
+     * @param neighbourHoodSize number of surrounding pixels to be used
+     * @return a copy of the baseline image modified so that each pixel is the maximum
+     * value of its neighbours
+     */
     public static PPMFile maxFilter(PPMFile inImage, int neighbourHoodSize)
     {
         int height = inImage.dimensions.getY();

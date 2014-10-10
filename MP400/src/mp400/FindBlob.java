@@ -1,27 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package mp400;
 
 import java.util.Map;
 
 /**
  *
- * @author akeegazooka
+ * @author Keegan Ott
  */
 
 
-    /*
-                System.out.println("Average pixel Components: "+blob.avePix.toString() +
-                    "\nBounding Box Area: "+blob.getBoundingBoxArea() +
-                    "\nBlob Density: "+ (blob.getDensity())  +
-                    "\nAspect Ratio: " + blob.getAspectRatio());
-    */
-
-public class FindStuff 
+public class FindBlob 
 {
+
+    /**
+     *Hardcoded classification criteria that consistently identifies the purple
+     * dome
+     * @param blobs
+     * @return
+     */
     public static Blob findPurpleDisk(Map<Integer,Blob> blobs)
     {
         Blob purpleDome = null;
@@ -43,6 +39,11 @@ public class FindStuff
         return purpleDome;
     }
     
+    /**
+     *Hardcoded classification criteria that consistently identifies the Amazon figurine
+     * @param blobs
+     * @return
+     */
     public static Blob findAmazon(Map<Integer,Blob> blobs)
     {
         Blob amazonMan = null;
@@ -70,6 +71,11 @@ public class FindStuff
         
     }
     
+    /**
+     *Hardcoded classification criteria that consistently identifies the Small Totoro
+     * @param blobs
+     * @return
+     */
     public static Blob findBlueTotoro(Map<Integer,Blob> blobs)
     {
         Blob blueToto = null;
@@ -91,6 +97,12 @@ public class FindStuff
         return  blueToto;
         
     }
+
+    /**
+     *Hardcoded classification criteria that consistently identifies the Large Totoro
+     * @param blobs
+     * @return
+     */
     public static Blob findGreyToto(Map<Integer,Blob> blobs)
     {
         Blob greyToto = null;
@@ -113,6 +125,11 @@ public class FindStuff
         return greyToto;
     }
     
+    /**
+     *Hardcoded classification criteria that consistently identifies the Keepon Toy
+     * @param blobs
+     * @return
+     */
     public static Blob findKeepon(Map<Integer,Blob> blobs)
     {
         Blob keepon = null;
@@ -134,6 +151,12 @@ public class FindStuff
             keepon.setObjectOfInterest("Keepon");
         return keepon;
     }
+
+    /**
+     *Hardcoded classification criteria that consistently identifies the Rubber duck 
+     * @param blobs
+     * @return
+     */
     public static Blob findDuck(Map<Integer,Blob> blobs)
     {
         Blob duck = null;
@@ -162,7 +185,11 @@ public class FindStuff
         return duck;
     }
 
-    
+    /**
+     *Hardcoded classification criteria that consistently identifies the Wheel Object
+     * @param blobs
+     * @return
+     */
     public static Blob findWheel(Map<Integer,Blob> blobs)
     {
         Blob wheel = null;
@@ -184,6 +211,11 @@ public class FindStuff
         
     }
     
+    /**
+     *Hardcoded classification criteria that attempts to identify the mexican hat
+     * @param blobs
+     * @return
+     */
     public static Blob findMexicanHat(Map<Integer,Blob> blobs)
     {
         Blob mexicanHat = null;
@@ -207,6 +239,11 @@ public class FindStuff
         return mexicanHat;
     }
     
+    /**
+     *Hardcoded classification criteria that consistently identifies sign elements
+     * @param blobs
+     * @return
+     */
     public static Blob findSign(Map<Integer,Blob> blobs)
     {
         Blob sign = null;

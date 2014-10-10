@@ -12,8 +12,17 @@ package mp400;
  */
 public abstract class pixAbstract {
     
+    /**
+     *
+     * @return
+     */
     @Override
     public abstract String toString();
+
+    /**
+     *
+     * @return
+     */
     public abstract pixAbstract getPixData();
             
     

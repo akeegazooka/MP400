@@ -11,9 +11,12 @@ package mp400;
  */
 public class MPUtility {
     
+    /**
+     *A simple Insertion sort performed on an array of doubles
+     * @param inArray
+     */
     public static void sort(Double[] inArray)
     {
-        //System.out.println(inArray[0]);
         int idx = 0;
         int j;
         double x;
@@ -31,6 +34,14 @@ public class MPUtility {
         }
     }
     
+    /**
+     *An image joining function, if the input images are binary
+     * then it functions as an OR operation otherwise it adds the components 
+     * normally, can result in breaching the max component value.
+     * @param inImage1
+     * @param inImage2
+     * @return
+     */
     public static PPMFile imageAdd(PPMFile inImage1, PPMFile inImage2)
     {
         PPMFile imageOut = new PPMFile(inImage1.dimensions.getX(), inImage1.dimensions.getY(), 255, "P3");
