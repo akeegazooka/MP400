@@ -8,7 +8,15 @@ import java.util.Map;
  * @author Keegan Ott
  */
 
-
+/**
+ * every classification filter function in this file initialises a Blob
+ * object to null and searches through blob candidates in order to find one
+ * that fits the bill, if none is found, the blob object remains null and 
+ * the check for null at the end of each function only allows an initialized
+ * blob to be written out - this works well for combination images which might
+ * not contain an object, the check for that object will still be completed
+ * but no file will be written out if nothing is found.
+ */
 public class FindBlob 
 {
 

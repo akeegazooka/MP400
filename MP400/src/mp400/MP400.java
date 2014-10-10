@@ -90,7 +90,12 @@ public class MP400 {
     public static void taskOne(PPMFile inFile, String outFolder)
     {
             outFolder = outFolder.concat("/");
-
+            
+            /**
+             * Here i create both the horizontal and vertical kernels for the
+             * sobel edge detection, the normalizing phase is important as it
+             * allows multiplication to stay within the colour space range.
+             */
             PixMask kSobelX = PPMConvolve.normalizeMask(new PixMask(Extra.sobelX));
             PixMask kSobelY = PPMConvolve.normalizeMask(new PixMask(Extra.sobelY));
 
@@ -105,7 +110,12 @@ public class MP400 {
             newPpmData = PPMConvolve.median(inFile, 5);
             /**
              * The a sobel edge detection operation is completed (adding
-             * both halves together in a single line).
+             * both halves together in a single line), initially i tried out
+             * several other blurring kernels and algorithms such as a Gauss
+             * Kernel in combination with a Mexican Hat kernel but that 
+             * produced very thick and unformed lines; a median filter
+             * in conjunction with a 3 x 3 Two Pass Sobel has delivered the best
+             * results in my opinion.
              */
             newPpmData = MPUtility.imageAdd(PPMConvolve.convolve(kSobelX, newPpmData), PPMConvolve.convolve(kSobelY, newPpmData));
             
@@ -140,7 +150,16 @@ public class MP400 {
             
             /**
              * In order to detect signs within a road scene Connected component
-             * labelling is used to detect regions similar to signs.
+             * labelling (CCL) is used to detect regions similar to signs.
+             * 
+             * I initially attempted to implement a circular Hough Transform
+             * but i struggled with it so i left it and continued onto task
+             * 2, realising the utility of CCL i came back to task 1 after 
+             * completing task 2 and decided to try CCL on the signs and it 
+             * worked quite well in the end - a few realistic scenes didnt
+             * turn out due to wild lighting and blurring variations but 
+             * overall i'm happy with my decision to use CCL over Circular
+             * Hough Transforms for this scenario.
              */
             Map<Integer,Blob> signs = new HashMap<Integer,Blob>();
             

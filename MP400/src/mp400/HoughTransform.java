@@ -174,7 +174,7 @@ public class HoughTransform {
     }
 
     /**
-     *Make sure no lines are too similar to eachother and keep the strongest line
+     *Make sure no lines are too similar to each other and keep the strongest line
      * @param inLines
      * @param thetaSimilarity
      * @param rSimilarity
@@ -185,32 +185,49 @@ public class HoughTransform {
 
         PolarLine[] goodLines;
         ArrayList<PolarLine> lineArray = new ArrayList<PolarLine>();
+        /* for every candidate line loop through */
         for (PolarLine line : inLines) 
         {
-            //System.out.println("---"+Math.abs(Math.abs(line.getTheta()) - Math.PI/2)+"---");
+            /**
+             * In order to filter out almost perfectly horizontal lines this function 
+             * Math.PI/2 being 90deg therefore if we that away from the positive
+             * angle it should not lie near flat.
+             */
             if (Math.abs(Math.abs(line.getTheta()) - Math.PI/2) > .18)  //10 degrees from horizontal
             {
+                /*if the list of new candidate lines is empty there is nothing to compare to
+                therefore add first entry*/
                 if(lineArray.isEmpty())
                     lineArray.add(line);
                 else
                 {
+                    /*if there are candidate lines to compare to*/
                     boolean isSimilar = false;
                     for(PolarLine newLine : lineArray)
                     {
+                        /*find the difference between both the R and
+                        theta components*/
                         double thetaDiff = Math.abs( newLine.getTheta() - line.getTheta() );
                         double distDiff = Math.abs ( newLine.getR() - line.getR() );
                         
+                        /*only if they are BOTH within the threshold, determine 
+                          that they are too similar.
+                        */
                         if( (thetaDiff <= thetaSimilarity) && (distDiff <= rSimilarity) )
                         {
                             isSimilar = true;
                         }
                     }
+                    /*if the line being compared is not too similar, add it to
+                    the list of lines to compare to*/
                     if( (!isSimilar) && (lineArray.size() < 3))
                         lineArray.add(line);
                 }
             }        
         }
         
+        /*create a static array of all the good candidate lines, populate it
+        then return it*/
         goodLines = new PolarLine[lineArray.size()];
         for(int ii = 0;ii<goodLines.length;ii++)
         {
@@ -234,6 +251,8 @@ public class HoughTransform {
         {
             for(int j = 0;j<thetaSteps;j++)
             {
+                /*normalize the vote value in order to get a decent 
+                RGB output from the calculation*/
                 Double v = (double) acc[j][i] / mostBinVotes*255.d;
                 PixRGB pixel = new PixRGB(v,v,v);
                 outHoughSpaceImage.setAt(j, i, pixel);
